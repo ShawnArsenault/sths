@@ -1,0 +1,94 @@
+#lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:160px;height:auto;margin-left:10px;}
+#lineeditor  #tabs .linesection input[type=button]{padding:0px 0px;text-align:center;margin-top:3px;}
+#lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
+
+#lineeditor  .playerlist{width:21%;float:left;}
+#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;}
+#lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
+#lineeditor  .linetabs {float:right;width:78%;}
+#lineeditor  .linetabs .sliders{width:87%;}
+#lineeditor  .linetabs .stratlabel{margin-top:3px;width:30px;}
+
+#lineeditor  .linetabs .textname:hover{cursor:default;}
+#lineeditor  option{padding:1px 0px 0px 5px;}
+#lineeditor  option + option{border-top:1px dotted #cccccc;}
+
+#lineeditor  .linetabs .stratvalue{width:80px;}
+#lineeditor  .linetabs .timevalue{width:80px;}
+
+#lineeditor  .updown{width:12px;height:12px;background-repeat:no-repeat;border-width:0px;background-color: transparent;background-size: 100% 100%;}
+#lineeditor  .up {background-image:url('http://anhs.qc.ca/images/icons/inc.png');margin:2px 0px 0px -4px;}
+#lineeditor  .down {background-image:url('http://anhs.qc.ca/images/icons/dec.png');margin:2px -4px 0px 0px;}
+
+#lineeditor  #errors{float:right;width:78%;border:1px solid #ffedde;}
+#lineeditor  #errorheader{font-weight:bold;}
+
+#lineeditor  .errorwrapper{padding:10px;overflow:hidden;}
+#lineeditor  .linescomplete{background-color:#248a1f;}
+#lineeditor  .linesincomplete{background-color:#c20000;}
+#lineeditor  .linesincomplete #errorheader {margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #ffffff;}
+#lineeditor  .linescomplete #errorheader {padding:10px 20px;}
+#lineeditor  .erroritem{font-size:11px;float:left;width:45%;margin-right:7px;}
+
+
+
+.linetabs .tabcontainer{overflow:hidden;}
+.linetabs h4{background-color: #e8e8e8;
+    border: 1px solid #c6c6c6;
+    margin: 0px 0px 7px 0px !important;
+    padding: 2px 6px;}
+.linetabs .blockcontainer{font-size:0.8em;padding:0px 10px;}
+.linetabs .linesection{position:relative;height:150px;width:22.5%;border:1px solid #cccccc;float:left;padding:5px 5px 5px 5px;box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);}
+.linetabs .linesection + .linesection{margin-left:10px;}
+.linetabs .sliders{position:absolute;bottom:5px;background-color:#f3f3f1;padding:3px;}
+.linetabs .positionwrapper{overflow:hidden;}
+.linetabs .positionline{clear:both;}
+.linetabs .positionline + .positionline{margin-top:3px;padding-top:3px;border-top:1px dotted #cccccc;}
+.linetabs .positionlabel{width:30px;float:left;}
+.linetabs .strategywrapper{overflow:hidden;margin-bottom:3px;padding-bottom:3px;border-bottom:1px solid #e8e8e8;}
+.linetabs .strats{overflow:hidden;float:left;}
+.linetabs .stratlabel{float:left;width:40px;}
+.linetabs .stratvalue{float:left;width:20px;}
+.linetabs .timelabel{float:left;width:60px;}
+.linetabs .timevalue{float:left;width:20px;}
+.linetabs .startinggoalie{margin-bottom:10px;}
+
+
+
+
+
+
+@media screen and (max-width: 80em) {
+	#lineeditor #tabs .linesection {
+	    height: auto;
+	    margin-bottom: 10px;
+	    margin-left: 10px;
+	    min-height: 160px;
+	    width: 96%;
+	}
+
+	
+
+	.ui-tabs .ui-tabs-panel {
+	    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+	    border-width: 0;
+	    display: block;
+	    padding: 1em 0em;
+	}
+
+
+	.positionwrapper{
+		width:70%;
+		float:left;
+	}
+	#lineeditor .linetabs .sliders {
+		position:static;
+		float:right;
+		width:27%;
+	}
+
+	.positionname{float:left;width:80%;}
+	.linetabs .strats{float:none;}
+	
+}
+	
