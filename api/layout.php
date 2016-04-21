@@ -44,7 +44,9 @@ function layout_header($id=false,$db=false){
 			?>
 			<?
 				if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
-					$onload = " onload=\"checkCompleteLines();\"";
+					//$onload = " onload=\"checkCompleteLines();\"";
+					$jsfunction = js_function_line_validator($db);
+					$onload = " onLoad=\"". $jsfunction ."\"";
 					$filename = "onthefly-Team" . $_REQUEST["TeamID"] .".js";
 					$pathabsolute = $_SERVER[DOCUMENT_ROOT] . "js/". $filename . "";
 					$pathrelative = "js/".$filename;
@@ -54,8 +56,7 @@ function layout_header($id=false,$db=false){
 					}
 
 					script_team_array($db,$pathrelative);?>
-					<script type="text/javascript" src="<?=$pathrelative?>?<?= time()?>"></script><? 
-					//unlink($pathabsolute);
+					<script type="text/javascript" src="<?=$pathrelative;?>?<?= time();?>"></script><? 
 				}
 			?>
 		</head>

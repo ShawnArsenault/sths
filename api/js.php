@@ -7,7 +7,14 @@ function js_function_roster_validator($db,$teamid){
 	}
 	return "roster_validator(". rtrim($f,",") .");";
 }
-
+function js_function_line_validator($db){
+	$jsRow = dbresult_line_editor_fields($db);
+	$f = "";
+	foreach(array_keys($jsRow) AS $k){
+		if(!is_numeric($k))$f .= (!is_numeric($jsRow[$k])) ? strtolower($jsRow[$k]) . "," : $jsRow[$k] .",";
+	}
+	return "line_validator(". rtrim($f,",") .");";
+}
 function js_team_array($db,$filename){
 	$file = @fopen($filename,"r+");
 	@ftruncate($file, 0);

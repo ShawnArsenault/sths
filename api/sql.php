@@ -239,4 +239,21 @@ function sql_roster_editor_fields($teamid){
 
 	return $sql;
 }
+function sql_line_editor_fields(){
+	$fields = fields_line_editor_setup();
+	$sql = "SELECT ";
+	foreach($fields AS $f){
+		if($f == "isAfterTradeDeadline"){
+			$sql .= "";
+		}elseif($f == "isWaivers"){
+			$sql .= "";
+		}else{
+			$sql .= $f . ",";
+		}
+	}
+	$sql = rtrim($sql,",") . " ";
+	$sql .= "FROM LeagueWebClient;";
+
+	return $sql;
+}
 ?>

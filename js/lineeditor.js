@@ -1,4 +1,6 @@
-function valChange(field,type,sid,updown){
+function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
+						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
+						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
 	var fieldvalue = parseInt(document.getElementById(field).value);
 	var curvalue = (updown == 'up') ? fieldvalue + 1 : fieldvalue - 1;
 	var curtotal = 0;
@@ -94,7 +96,9 @@ function valChange(field,type,sid,updown){
 		if(!flag && updown == 'up' && curtotal <= maxmin && fieldvalue <= maxmin){document.getElementById(field).value = curvalue;}
 		if(!flag && updown == 'down' && curtotal >= maxmin && fieldvalue >= maxmin){document.getElementById(field).value = curvalue;}
 	}
-	checkCompleteLines();	
+	line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
+						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
+						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond);	
 }
 function getGroups(){
 	var group = [];
@@ -185,6 +189,7 @@ function isDuplicates(arr1,x){
 
 	return ret;
 }
+
 function verifyLines(){
 	var errortext = "";
 	var section = getSections();
@@ -236,6 +241,8 @@ function verifyStrat(){
 	
 	return errortext;
 }
+
+
 function verifyTime(){
 	
 	var errortext = '';
@@ -315,7 +322,7 @@ function findPlayerInRoster(selected,type,league){
 
 	return foundIt;
 }
-function ChangePlayer(id,league){
+function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
 	var selected = document.getElementById('sltPlayerList').value;
 	var explode = selected.split("|");
 	var groups = getGroups();
@@ -349,20 +356,94 @@ function ChangePlayer(id,league){
 	if(changeIt){
 		//alert(foundIt);
 		document.getElementById(id).value = explode[0];
-		checkCompleteLines();
+		line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
+						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
+						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond);
 	};
 }
-function checkCompleteLines(){
+
+function verifyBlockPlayerFromPlaying(Lines12,Lines123,Lines12inPPPK){
+	var errortext = '';
+	if(Lines12 || Lines123){
+		var ss = [];
+		var pp = [];
+		var check = [];
+		var ssuse = [];
+		var ppuse = [];
+
+		ss[0] = ['Line15vs5Forward','Line25vs5Forward'];
+		ss[1] = ['Line15vs5Defense','Line25vs5Defense'];
+		
+		pp[0] = ['Center','LeftWing','RightWing'];
+		pp[1] = ['Defense1','Defense2'];
+		
+		check[0] = [];
+		check[1] = [];
+
+		var player = '';
+		var lineid = '';
+		var baseText = 'Duplicate Player Lines 1,2';
+		var duplicateText = '';
+
+		if(Lines123){
+			ss[0].push('Line35vs5Forward');
+			ss[1].push('Line35vs5Defense');
+			duplicateText += ',3';
+		}
+
+		for(var x=0;x<2;x++){
+			check = [];
+			ssuse = ss[x];
+			ppuse = pp[x];
+			duplicateText = (x==0) ? "Forward " + baseText : "Defense " + baseText;
+
+			for(var s=0;s<ssuse.length;s++){
+				for(p=0;p<ppuse.length;p++){
+					lineid = ssuse[s] + ppuse[p];
+					player = document.getElementById(lineid).value;
+					
+					if(inArray(player,check)){
+						errortext += '<div class="erroritem">'+ duplicateText +'</div>';
+						break;
+					}else{
+						check.push(player);
+					}	
+				}
+			}
+		}
+		
+		
+		
+		
+		
+	}
+	
+	return errortext;
+
+}
+function inArray(needle, haystack) {
+	var ret = false;
+    var length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(haystack[i] == needle){ret = true;}
+    }
+    return ret;
+}
+function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
 	var headertext = '';
 	var headerstyle = '';
 	var display = '';
 	var disabled = '';
 
 	var lines = verifyLines();
+	var blockplayer = verifyBlockPlayerFromPlaying(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK);
 	var strat = verifyStrat();
 	var linetime = verifyTime();
 	
-	var errors = lines + strat + linetime;
+
+	
+	
+	var errors = lines + strat + linetime + blockplayer;
 	
 	if(errors.trim() === ""){
 		headertext = "Lines are Complete";
