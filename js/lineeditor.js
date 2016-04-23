@@ -410,16 +410,9 @@ function verifyBlockPlayerFromPlaying(Lines12,Lines123,Lines12inPPPK){
 					}	
 				}
 			}
-		}
-		
-		
-		
-		
-		
+		}		
 	}
-	
 	return errortext;
-
 }
 function inArray(needle, haystack) {
 	var ret = false;
@@ -447,11 +440,11 @@ function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLine
 	
 	if(errors.trim() === ""){
 		headertext = "Lines are Complete";
-		headerstyle = "linescomplete";
+		headerstyle = "confirm";
 		disabled = false;
 	}else{
 		headertext = "Incomplete Lines";
-		headerstyle = "linesincomplete";
+		headerstyle = "error";
 		disabled = true;
 	}
 	display  = "<div class='errorwrapper "+ headerstyle +"'>";

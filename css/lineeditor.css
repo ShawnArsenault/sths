@@ -2,8 +2,8 @@
 #lineeditor  #tabs .linesection input[type=button]{padding:0px 0px;text-align:center;margin-top:3px;}
 #lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
 
-#lineeditor  .playerlist{width:21%;float:left;}
-#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;}
+#lineeditor  .playerlist{width:21%;float:left;border:1px solid #666666;margin:2px; padding:2px;}
+#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;}
 #lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
 #lineeditor  .linetabs {float:right;width:78%;}
 #lineeditor  .linetabs .sliders{width:87%;}
@@ -20,15 +20,19 @@
 #lineeditor  .up {background-image:url('http://anhs.qc.ca/images/icons/inc.png');margin:2px 0px 0px -4px;}
 #lineeditor  .down {background-image:url('http://anhs.qc.ca/images/icons/dec.png');margin:2px -4px 0px 0px;}
 
-#lineeditor  #errors{float:right;width:78%;border:1px solid #ffedde;}
+
+/*#lineeditor  #errors{float:right;width:78%;/*border:1px solid #ffedde;}*/
 #lineeditor  #errorheader{font-weight:bold;}
 
+
 #lineeditor  .errorwrapper{padding:10px;overflow:hidden;}
+/*
 #lineeditor  .linescomplete{background-color:#248a1f;}
-#lineeditor  .linesincomplete{background-color:#c20000;}
+#lineeditor  .linesincomplete{background-color:#d04437;}
 #lineeditor  .linesincomplete #errorheader {margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #ffffff;}
 #lineeditor  .linescomplete #errorheader {padding:10px 20px;}
-#lineeditor  .erroritem{font-size:11px;float:left;width:45%;margin-right:7px;}
+*/
+#lineeditor  .erroritem{font-size:11px;float:left;margin-right:15px;}
 
 
 
@@ -37,6 +41,7 @@
     border: 1px solid #c6c6c6;
     margin: 0px 0px 7px 0px !important;
     padding: 2px 6px;}
+
 .linetabs .blockcontainer{font-size:0.8em;padding:0px 10px;}
 .linetabs .linesection{position:relative;height:150px;width:22.5%;border:1px solid #cccccc;float:left;padding:5px 5px 5px 5px;box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);}
 .linetabs .linesection + .linesection{margin-left:10px;}
@@ -89,6 +94,8 @@
 
 	.positionname{float:left;width:80%;}
 	.linetabs .strats{float:none;}
+	.linetabs #tabs li{font-size:1.3vw;}
+
 	
 }
 	

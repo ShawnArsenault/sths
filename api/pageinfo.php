@@ -271,6 +271,8 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 
 		// If there is a team selected
 		if($teamid > 0 && $league){
+			// Error block for updating feedback to the user.
+			?><div id="errors"></div><?
 			if($league == "Pro"){
 				// Set Pro variables
 				$status1 = 3;
@@ -325,15 +327,14 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$positions = get_line_arrays("positions");
 			$strategy = get_line_arrays("strategy");
 			?>
-			<?// Error block for updating feedback to the user.?>
-			<div id="errors"></div>
+			
 			<? // Start the tabs for pages of lines.?>
 			<div class="linetabs">
 				<div id="tabs">
 					<ul>
 						<? // loop through the tab names creating clickable tabs. ?>
 						<?foreach($tabs AS $i=>$t){
-							?><li><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?
+							?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?
 						}?>	
 					</ul>
 					<?$count = 0;?>
