@@ -2,8 +2,8 @@
 #lineeditor  #tabs .linesection input[type=button]{padding:0px 0px;text-align:center;margin-top:3px;}
 #lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
 
-#lineeditor  .playerlist{width:21%;float:left;border:1px solid #666666;margin:2px; padding:2px;}
-#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;}
+#lineeditor  .playerlist{width:20%;float:left;border:1px solid #666666;margin:2px; padding:2px;}
+#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;font-size:1.3vw;}
 #lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
 #lineeditor  .linetabs {float:right;width:78%;}
 #lineeditor  .linetabs .sliders{width:87%;}

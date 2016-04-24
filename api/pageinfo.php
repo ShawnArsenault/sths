@@ -50,6 +50,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 		}// End foreach $arrSort
 		//Update the database and save the lines.
 		$db->exec($sql);
+		$confirmbanner = "<div class=\"confirm\">Lines have been saved.</div>";  
 	} // End if isset($_POST["sbtRoster"])
 	
 	// Get the team selection form from the html API if needed
@@ -61,6 +62,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 	if($teamid > 0){?>
 		<div id="<?= $id ?>">
 			<?
+			echo $confirmbanner;
 			$status = array();
 			// Use the player_base SQL API to get the base information
 			// loop for players and goalies
@@ -138,16 +140,17 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 					}
 				?>
 
-				<input type="button" id="change" value="Copy Roster 1 to other days." >
+				<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
 				<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
 				<? 
 				// This accordion id is a JQuery accordion. If this ID changes then the JQuery has to be changed as well.
 				?>
-				<div id="accordion">
+				<div id="accordionfuture">
 					<?
 					// Loop through the next games variable to get the lines for the next 10 games.
 					foreach($nextgames AS $nextgame=>$games){?>
-						<? $accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+						<? //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+						<? $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
 						<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
 						<div>
 							<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
@@ -214,6 +217,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 								}?>
 							</div><!-- End .columnwrapper-->
 						</div><!-- End classless/id-less div for the accordion--><?
+					break;
 					} // End foreach $nextgames?>
 				</div><!-- End #accordion-->
 			</form> <!-- End frmRostereditor -->
