@@ -301,7 +301,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			?>
 			<div class="playerlist">
 				<form name="frmPlayerList">
-					<select size="21" id="sltPlayerList">
+					<select size="23" id="sltPlayerList">
 						<?	// Loop through the players and add to the select list.
 							$oRS = $db->query($sql);
 							while($row = $oRS->fetchArray()){
