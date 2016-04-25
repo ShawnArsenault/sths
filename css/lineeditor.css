@@ -3,7 +3,7 @@
 #lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
 
 #lineeditor  .playerlist{width:20%;float:left;border:1px solid #666666;margin:2px; padding:2px;}
-#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;font-size:1.3vw;}
+#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;}
 #lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
 #lineeditor  .linetabs {float:right;width:78%;}
 #lineeditor  .linetabs .sliders{width:87%;}
@@ -64,15 +64,19 @@
 
 
 @media screen and (max-width: 80em) {
+	#lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:160px;height:auto;}
+	.linetabs .linesection + .linesection{margin-left:0px;}
+	#lineeditor .linetabs{width:75%;}
+	#lineeditor  #tabs .linesection input.textname {width:98%;border:1px solid #e8e8e8;padding:1px 5px;}
 	#lineeditor #tabs .linesection {
 	    height: auto;
 	    margin-bottom: 10px;
-	    margin-left: 10px;
+	    margin-left: 0px;
 	    min-height: 160px;
 	    width: 96%;
 	}
 
-	
+	#lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;font-size:1.3vw;}
 
 	.ui-tabs .ui-tabs-panel {
 	    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
@@ -80,10 +84,11 @@
 	    display: block;
 	    padding: 1em 0em;
 	}
+	
 
 
 	.positionwrapper{
-		width:70%;
+		width:68%;
 		float:left;
 	}
 	#lineeditor .linetabs .sliders {
