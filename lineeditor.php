@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once("api/api.php");
 	require_once("fns.php");
 	// exempt is an array of api file names in the api directory.
@@ -15,8 +15,8 @@
 	layout_header("lineeditor",$db);
 
 	// Look for a team ID in the URL, if non exists use 0
-	$t = ($_REQUEST["TeamID"] != "") ? $_REQUEST["TeamID"] : 0;
-	$l = ($_REQUEST["League"] != "") ? $_REQUEST["League"] : false;
+	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
+	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
 
 	// Display the line editor page using API.
 	pageinfo_editor_lines($db,$t,$l);

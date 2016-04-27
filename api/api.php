@@ -8,13 +8,11 @@ function sqlite_connect($filename="STHS.db"){
 // Exemptions to the items in the array
 function requires($exempt=array()){
 	$files = glob(dirname(__FILE__) . "/*.php");
-	$exp = explode("/",$files[0]);
-	unset($exp[5]);
-	$path = implode("/", $exp) . "/";
-
 	foreach($files AS $f){
-		$e = explode($path,$f);
-		if($e[1] != "api.php" && !in_array($e[1], $exempt)){
+		$exp = explode("/",$f);
+		$file = $exp[count($exp)-1];
+		
+		if($file != "api.php" && !in_array($file, $exempt)){
 			require_once($f);
 		}
 	}

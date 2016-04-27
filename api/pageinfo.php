@@ -1,10 +1,12 @@
-<?php
+<?php 
 function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 	// $db = sqlite DB
 	// $teamid is a teamid to use that teams roster.
 	// $showDropdown is a flag if you want to toggle between teams.
 
 	$id = "rostereditor";
+	$confirmbanner = "";
+	$sql = "";
 	// If the Save Lines button has been clicked.
 	if(isset($_POST["sbtRoster"])){
 		// Create an array to organize the information
@@ -61,7 +63,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 	// If there is a team ID to use
 	if($teamid > 0){?>
 		<div id="<?= $id ?>">
-			<?
+			<?php 
 			echo $confirmbanner;
 			$status = array();
 			// Use the player_base SQL API to get the base information
@@ -76,8 +78,6 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 
 			$sql = rtrim($sql,"UNION ") . " ";
 			$sql .= "ORDER BY PositionNumber, Overall DESC";
-
-			
 			$oRS = $db->query($sql);
 
 			// Loop through queries result and add values to new array to display players and goalies
@@ -131,10 +131,10 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 			// start the form to submit the roster.
 			?>
 			<form name="frmRosterEditor" method="POST" id="frmRoster">
-				<?
+				<?php 
 					foreach(dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
 						if(!is_numeric($k)){
-							?><input type="hidden" id="<?= $k ?>" value="<?=strtolower($f); ?>"><?
+							?><input type="hidden" id="<?= $k ?>" value="<?=strtolower($f); ?>"><?php 
 							echo "\n";
 						}
 					}
@@ -142,19 +142,19 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 
 				<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
 				<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
-				<? 
+				<?php  
 				// This accordion id is a JQuery accordion. If this ID changes then the JQuery has to be changed as well.
 				?>
 				<div id="accordionfuture">
-					<?
+					<?php 
 					// Loop through the next games variable to get the lines for the next 10 games.
 					foreach($nextgames AS $nextgame=>$games){?>
-						<? //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-						<? $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+						<?php  //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+						<?php  $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
 						<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
 						<div>
 							<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
-							<div class="columnwrapper"><?
+							<div class="columnwrapper"><?php 
 								for($x=3;$x>=0;$x--){
 									if($x == 3){
 										$type = "Pro Dress";	
@@ -176,7 +176,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 										<ol id="sort<?= str_replace(" ","",$columnid)?>" class="sort<?= str_replace(" ","",$columnid) . $nextgame; ?> connectedSortable ui-sortable">
 											<h4 class="columnheader"><?= $type?></h4>
 											<input class="rosterline<?=$nextgame; ?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="LINE|<?= $columnid; ?>">
-											<? 	
+											<?php  	
 												// Checks to see if there are players in the current category.
 												// example, if there is at least 1 player in the ProScratch category, loop through and display
 												if(array_key_exists($x, $status[$nextgame])){
@@ -191,7 +191,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 														?>
 														<li id="line<?=$nextgame . "_" . MakeCSSClass($s["Name"])?>"class="playerrow <?= $columnid . $inj; ?>">
 															<div class="rowinfo">
-																<?
+																<?php 
 																// Use a hidden field in the form to get the info to save to the SQLite DB.
 																// The value of the hidden field is a string separated by pipes (|) to parse
 																// on submit "fieldName|fieldNumber|positionNumber(1-16)|positionString(C,LW)"
@@ -208,20 +208,20 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 																<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
 															</div>
 														</li>
-													<?}
+													<?php }
 												}?>
 										</ol>
 									</div>
-									<?
+									<?php 
 
 								}?>
 							</div><!-- End .columnwrapper-->
-						</div><!-- End classless/id-less div for the accordion--><?
+						</div><!-- End classless/id-less div for the accordion--><?php 
 					break;
 					} // End foreach $nextgames?>
 				</div><!-- End #accordion-->
 			</form> <!-- End frmRostereditor -->
-		</div><!-- End #rostereditor->$id --><?
+		</div><!-- End #rostereditor->$id --><?php 
 	}// End if there is a teamid as a parameter
 }
 function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
@@ -268,7 +268,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 	}// end isset $_POST[sbtUpdateLines]
 
 	// Get the team selection form from the html API if needed ?>
-	<div id="<?= $id ?>"><?
+	<div id="<?= $id ?>"><?php 
 		if($showDropdown){
 			html_form_teamid($db,true);
 		} // End if there is a showDropdown flag
@@ -276,7 +276,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 		// If there is a team selected
 		if($teamid > 0 && $league){
 			// Error block for updating feedback to the user.
-			?><div id="errors"></div><?
+			?><div id="errors"></div><?php 
 			if($league == "Pro"){
 				// Set Pro variables
 				$status1 = 3;
@@ -288,6 +288,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			}
 			// get the fields needed for the ChangePlayer function onClick
 			$dbfields = dbresult_line_editor_fields($db);
+			$cpfields = "";
 			foreach($dbfields AS $f){$cpfields .= strtolower($f) .",";}
 			$cpfields = rtrim($cpfields,",");
 			
@@ -302,18 +303,19 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			<div class="playerlist">
 				<form name="frmPlayerList">
 					<select size="23" id="sltPlayerList">
-						<?	// Loop through the players and add to the select list.
+						<?php 	// Loop through the players and add to the select list.
 							$oRS = $db->query($sql);
+							$first = true;
 							while($row = $oRS->fetchArray()){
 								//if its the first item in the loop, select the item as default.
 								if($first){$s = " selected";$first = false;}else{$s = "";}
 								// Separate Name and number with a pipe '|' to split in the javascript.
-								?><option<?= $s?> value="<?= $row["Name"]?>|<?= $row["Number"]?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <?
+								?><option<?= $s?> value="<?= $row["Name"]?>|<?= $row["Number"]?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <?php 
 							}?>
 					</select><!--end sltPlayerList-->
 				</form><!-- end frmPlayerList-->
 			</div><!-- end playerlist-->
-			<?
+			<?php 
 			// Select all the lines and players in them for the next game.
 			$sql = "SELECT l.* FROM Team". $league ."Lines AS l LEFT JOIN Team". $league ."Info AS t ON t.Number = l.TeamNumber ";
 			$sql .= "WHERE t.Number = '" . $teamid . "' AND Day = 1 ";
@@ -330,40 +332,42 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$blocks = get_line_arrays("blocks");
 			$positions = get_line_arrays("positions");
 			$strategy = get_line_arrays("strategy");
+			$count = 0;
 			?>
 			
-			<? // Start the tabs for pages of lines.?>
+			<?php  // Start the tabs for pages of lines.?>
 			<div class="linetabs">
 				<div id="tabs">
 					<ul>
-						<? // loop through the tab names creating clickable tabs. ?>
-						<?foreach($tabs AS $i=>$t){
-							?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?
+						<?php  // loop through the tab names creating clickable tabs. ?>
+						<?php  
+						foreach($tabs AS $i=>$t){
+							?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php 
 						}?>	
 					</ul>
-					<?$count = 0;?>
-					<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?
+					<?php $count = 0;?>
+					<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
 						// Loop through the tabs info making the lines pages.
 						foreach($tabs AS $i=>$t){
-							?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?
+							?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?php 
 								if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
 									// Each of the if'ed statements above have the same kind of info. 
 									// display the blocks based on which tabbed page you are on.
-									make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields);
+									make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
 								}elseif($i == "Others"){?>
-									<?// Start with the goalies. ?>
+									<?php // Start with the goalies. ?>
 									<div class="linesection <?= MakeCSSClass($i)?> goalies">
-										<?
+										<?php 
 											foreach(array(1=>"Starting Goalie",2=>"Backup Goalie") AS $gid=>$g){?>
 												<h4><?= $g?></h4>
 												<div class="blockcontainer">
-													<? $row["Goaler" . $gid] = (isset($availableplayers[MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
-													<div class="<? MakeCSSClass($g)?>"><?= "<input id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
-												</div><?
+													<?php  $row["Goaler" . $gid] = (isset($availableplayers[MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
+													<div class="<?php  MakeCSSClass($g)?>"><?= "<input id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
+												</div><?php 
 											}
 										?>
 									</div><!-- end linesection <?= MakeCSSClass($i)?> goalies-->
-									<?
+									<?php 
 									// Get the other page fields needed for the blocks.
 									$field = get_line_arrays("otherfield");
 
@@ -372,45 +376,45 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 										<div class="linesection <?= MakeCSSClass($i)?> extra <?= $fs?>">
 											<h4>Extra <?= $fs?></h4>
 											<div class="blockcontainer">
-												<?foreach($field["end"] AS $feid=>$fe){
+												<?php foreach($field["end"] AS $feid=>$fe){
 													$usefield = "Extra" .$fsid . $fe;
 													if(array_key_exists($usefield, $row)){?>
 														<div class="positionline">
 															<div class="positionlabel"><?= $fe?></div>
 															<div class="positionname">
-																<? $row[$usefield] = (isset($availableplayers[MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
+																<?php  $row[$usefield] = (isset($availableplayers[MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
 																<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
 															</div>
-														</div><?
+														</div><?php 
 													}
 												}?>
 											</div><!--end blockcontainer -->
-										</div><!-- end linesection <?= MakeCSSClass($i)?> extra <?= $fs?>--><?
+										</div><!-- end linesection <?= MakeCSSClass($i)?> extra <?= $fs?>--><?php 
 									}?>
-									<?// Make the penalty shots order?>
+									<?php // Make the penalty shots order?>
 									<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
 										<h4>Penalty Shots</h4>
 										<div class="blockcontainer">								
 											<div class="penaltyshot">
-												<? for($x=1;$x<6;$x++){?>
+												<?php  for($x=1;$x<6;$x++){?>
 												<div class="positionline">
 													<div class="positionname">
-														<? $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
+														<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
 														<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
 													</div>	
 												</div>
-												<?}?>
+												<?php }?>
 											</div>
 										</div><!-- end blockcontainer-->
 									</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots-->
-									<?
+									<?php 
 								}else{
 									// Make the Offsensive and Defensive Lines.
 									$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
 									foreach($types AS $tid=>$t){?>
 										<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
 											<h4><?= $t?></h4>
-											<div class="blockcontainer"><?
+											<div class="blockcontainer"><?php 
 												$fordef = array("Forward", "Defense");
 												foreach($fordef AS $fd){
 													foreach($positions[$fd] AS $pid=>$pos){
@@ -422,31 +426,31 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 																<div class="positionname">
 																	<?= "<input id=\"". $usefield ."\" onclick=\"ChangePlayer('". $usefield ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $usefield ."]\" value=\"". $row[$usefield] ."\">";?>
 																</div>
-															</div><?
+															</div><?php 
 														}
 													}
 												}?>
 											</div><!-- end blockcontainer-->
-										</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots--><?
+										</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots--><?php 
 									}
 								}
-							?></div><!-- end tabs-<?= $count ?>--><?
+							?></div><!-- end tabs-<?= $count ?>--><?php 
 						}?>
 						<input id="linesubmit" type="submit" value="Update Lines" name="sbtUpdateLines">
 					</form>
 				</div><!-- end tabs-->
-			</div><!-- end linetabs--><?
+			</div><!-- end linetabs--><?php 
 		}// end if a team is selected?>
-	</div><?
+	</div><?php 
 }
-function make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields){
+function make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league){
 	$bcount = 0;
 	foreach($blocks[$i] AS $bid=>$block){?>
 		<div class="linesection <?= MakeCSSClass($i)?> <?= MakeCSSClass($bid)?>">
 			<h4><?= $block ?></h4>
 			<div class="blockcontainer">
 				<div class="positionwrapper">
-					<?	// Depending on which page you are on sets up how many blocks are needed.
+					<?php 	// Depending on which page you are on sets up how many blocks are needed.
 						// If its anything but 5vs5
 						if($i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){
 							if($bid == strtolower($i) . "line1" || $bid == strtolower($i) . "line2"){
@@ -469,49 +473,49 @@ function make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpf
 							$field = "Line". ++$bcount ."5vs5" . $i;
 							$posit = $positions[$i];
 						}?>
-					<?foreach($posit AS $pid=>$pos){?>
+					<?php foreach($posit AS $pid=>$pos){?>
 						<div class="positionline">
 							<div class="positionlabel"><?= $pos?></div>
 							<div class="positionname">
-								<? $row[$field . $pid] = (isset($availableplayers[MakeCSSClass($row[$field . $pid])])) ? $row[$field . $pid]: "";?>
+								<?php  $row[$field . $pid] = (isset($availableplayers[MakeCSSClass($row[$field . $pid])])) ? $row[$field . $pid]: "";?>
 								<?= "<input id=\"". $field . $pid ."\" onclick=\"ChangePlayer('". $field . $pid ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $field . $pid ."]\" value=\"".  $row[$field . $pid] ."\">";?>
 							</div>
 						</div>
-					<?}?>
+					<?php }?>
 				</div><!-- end positionwrapper-->
 				<div class="sliders">
 					<div class="strategywrapper">
 						<div class="strategy">
-							<?foreach($strategy AS $sid=>$strat){?>
+							<?php foreach($strategy AS $sid=>$strat){?>
 								<div class="strats">
 									<div class="stratlabel"><?= $sid?> : </div>
 									<div class="stratvalue">
-										<?make_strategies($row,$field,$sid,true,$cpfields);?>
+										<?php make_strategies($row,$field,$sid,true,$cpfields);?>
 									</div>
 								</div>
-							<?}?>
+							<?php }?>
 						</div><!-- end strategy-->
 					</div><!-- end strategywrapper-->
 					<div class="timewrapper">
 						<div class="time">
 							<div class="timelabel">Time % : </div>
 							<div class="timevalue">
-								<?make_strategies($row,$field,"Time",false,$cpfields);?>
+								<?php make_strategies($row,$field,"Time",false,$cpfields);?>
 							</div>
 						</div>
 					</div><!-- end timerwrapper-->
 				</div><!-- end sliders-->
 			</div><!-- end blockcontainer-->
-		</div><!-- end linesection <?= MakeCSSClass($i)?> <?= MakeCSSClass($bid)?>--><?
+		</div><!-- end linesection <?= MakeCSSClass($i)?> <?= MakeCSSClass($bid)?>--><?php 
 	}
 }
 function make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
-	<?$use = ($strat) ? "Strat" : "Time";?>
-	<?$id = $field . $sid; ?>
+	<?php $use = ($strat) ? "Strat" : "Time";?>
+	<?php $id = $field . $sid; ?>
 	<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="">
 	<input readonly size="1" id="<?= $id?>" class="stratval" type="text" name="txtStartegies[<?= $id ?>]" value="<?= $row[$id] ?>">
 	<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="">
-	<?
+	<?php 
 }
 function get_line_arrays($type="blocks"){
 	// This returns an array of needed information.

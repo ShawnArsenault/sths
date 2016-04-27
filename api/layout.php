@@ -1,4 +1,4 @@
-<?
+<?php
 function layout_header($id=false,$db=false){
 	?>
 	<!DOCTYPE html>
@@ -11,7 +11,7 @@ function layout_header($id=false,$db=false){
 			<meta name="viewport" content="width=device-width" />
 			<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 			<link rel="stylesheet" href="css/labs.css">
-				<? 
+				<?php 
 				// Using the $id paramater, check if there is a css file with that name to use for this page only. 
 				// If the $id.css exists, load it in.
 				foreach(array("css","js") AS $filetype){
@@ -19,19 +19,19 @@ function layout_header($id=false,$db=false){
 					if(file_exists($file)):
 						if($filetype == "css"){
 						?>
-							<link rel="stylesheet" href="<?= $file ?>"><?
+							<link rel="stylesheet" href="<?= $file ?>"><?php
 						}else{
-							?><script src="<?= $file ?>"></script><?
+							?><script src="<?= $file ?>"></script><?php
 						}
 					endif;
 				}?>
 
-			<?//<script src="js/scripts_labs.js"></script><!-- Load in the scripts needed from labs -->?>
+			<script src="js/scripts_labs.js"></script><!-- Load in the scripts needed from labs -->
 			<script src="http://code.jquery.com/jquery-1.9.1.js"></script> <!-- Load in JQuery -->
 			<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script><!-- Load in JQuery UI -->
 			<script src="js/jquery.ui.touch-punch.min.js"></script><!-- Load in JQuery Needed for mobile devices -->
 			<script src="js/jquery.labs.js"></script><!-- Load in JQuery from Labs -->
-			<?
+			<?php
 				// Check for $id for rostereditor page. 
 				// If we are on the roster editor page, the body tage needs an onload function to validate the rosters at default.
 				// If so and a team is selected, create the onload attribute with the js_function_roster_validator to placein the body tag. 
@@ -42,13 +42,13 @@ function layout_header($id=false,$db=false){
 					jquery_roster_editor_draggable($jsfunction);
 				}
 			?>
-			<?
+			<?php
 				if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
 					//$onload = " onload=\"checkCompleteLines();\"";
 					$jsfunction = js_function_line_validator($db);
 					$onload = " onLoad=\"". $jsfunction ."\"";
 					$filename = "onthefly-Team" . $_REQUEST["TeamID"] .".js";
-					$pathabsolute = $_SERVER[DOCUMENT_ROOT] . "js/". $filename . "";
+					$pathabsolute = $_SERVER["DOCUMENT_ROOT"] . "js/". $filename . "";
 					$pathrelative = "js/".$filename;
 					
 					if(!file_exists($pathabsolute)){
@@ -56,17 +56,17 @@ function layout_header($id=false,$db=false){
 					}
 
 					script_team_array($db,$pathrelative);?>
-					<script type="text/javascript" src="<?=$pathrelative;?>?<?= time();?>"></script><? 
+					<script type="text/javascript" src="<?=$pathrelative;?>?<?= time();?>"></script><?php 
 				}
 			?>
 		</head>
 	<?php
 	// Start the Body, add an onload function if set above.
-	?><body<?=$onload;?>><?
+	?><body<?= (isset($onload)) ? $onload : "";?>><?php
 }
 
 function layout_footer(){
-	?></body></html><?
+	?></body></html><?php
 }
 
 function script_team_array($db,$filename){
@@ -95,7 +95,7 @@ function script_team_array($db,$filename){
 		}
 	}
 
-	$j .= "function make_position_list(){\n";
+	$j = "function make_position_list(){\n";
 	$j .= "var pos = [];\n";
 	$j .= "pos[0] = [];\n";
 	$j .= "pos[1] = [];\n";

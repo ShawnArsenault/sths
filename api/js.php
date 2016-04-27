@@ -1,4 +1,4 @@
-<?
+<?php
 function js_function_roster_validator($db,$teamid){
 	$jsRow = dbresult_roster_editor_fields($db,$teamid);
 	$f = "";

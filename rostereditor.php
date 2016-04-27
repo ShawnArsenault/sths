@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once("api/api.php");
 	
 	// exempt is an array of api file names in the api directory.
@@ -15,7 +15,7 @@
 	layout_header("rostereditor",$db);
 
 	// Look for a team ID in the URL, if non exists use 0
-	$t = ($_REQUEST["TeamID"] != "") ? $_REQUEST["TeamID"] : 0;
+	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
 
 	// Display the roster editor page using API.
 	pageinfo_editor_roster($db,$t);

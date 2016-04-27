@@ -15,7 +15,7 @@ function jquery_roster_editor_draggable($jsfunction){
 	    $('#sortable').draggable();
 	});
 	</script>
-	<?
+	<?php
 }
 
 

@@ -1,4 +1,4 @@
-<?
+<?php
 /*********************************************/
 // SQLite Snippets
 /********************************************/
@@ -100,6 +100,7 @@
 	}
 	// Returns current Streaks
 	function sql_playerStreak($type="Player",$prefix=false){
+		$streak = "";
 		if($prefix){$p = $prefix . ".";}
 		if($type == "Player"){
 			$streak = "" . $p ."GameInRowWithAPoint AS GameInRowWithAPoint, " . $p ."GameInRowWithAGoal AS GameInRowWithAGoal ";
@@ -164,7 +165,7 @@
 // Select Calls for players. $type = "Player" or "Goaler" 
 function sql_players_select($type="Player"){
 	$t = $type . "Info.";
-	$sql .= "SELECT " . $t ."Number AS Number, " . $t ."Name AS Name, ";
+	$sql = "SELECT " . $t ."Number AS Number, " . $t ."Name AS Name, ";
 	$sql .= "" . sql_position($type,$type . "Info") ." AS Position, ". sql_position_number($type,$type . "Info") ." AS PositionNumber, ". sql_position_string($type,$type . "Info") ." AS PositionString, ". sql_position_all($type,$type . "Info") .", ";
 	$sql .= "" . $t ."Country AS Country, " . $t ."Team AS Team, " . $t ."Age AS Age, " . $t ."AgeDate AS AgeDate, " . $t ."Weight AS Weight, " . $t ."Height AS Height, ";
 	$sql .= "" . $t ."Contract AS Contract, " . $t ."Rookie AS Rookie, " . $t ."Injury AS Injury, " . $t ."NumberOfInjury AS NumberOfInjury, ";
