@@ -118,7 +118,7 @@ function getGroups(){
 	group[13] = ['Line2PK4ForwardCenter','Line2PK4ForwardWing','Line2PK4DefenseDefense1','Line2PK4DefenseDefense2'];
 	group[14] = ['Line1PK3ForwardCenter','Line1PK3DefenseDefense1','Line1PK3DefenseDefense2'];
 	group[15] = ['Line2PK3ForwardCenter','Line2PK3DefenseDefense1','Line2PK3DefenseDefense2'];
-	group[16] = ['Goaler1','Goaler2'];
+	group[16] = ['Goaler1','Goaler2','Goaler3'];
 	group[17] = ['ExtraForwardN1','ExtraForwardN2','ExtraForwardN3'];
 	group[18] = ['ExtraForwardPP1','ExtraForwardPP2'];
 	group[19] = ['ExtraForwardPK'];
@@ -199,8 +199,12 @@ function verifyLines(){
 			errortext += '<div class="erroritem">' + text[x] + '</div>';
 		}else{
 			for(i=0;i<section[x].length;i++){
-				if (section[x][i] == "" || section[x][i].length == 0 || section[x][i] == null){
+				if (x != 16 && section[x][i] == "" || x != 16 && section[x][i].length == 0 || x != 16 && section[x][i] == null || 
+					x == 16 && section[x][0] == "" || x == 16 && section[x][0].length == 0 || x == 16 && section[x][0] == null || 
+					x == 16 && section[x][1] == "" || x == 16 && section[x][1].length == 0 || x == 16 && section[x][1] == null){
 					errortext += '<div class="erroritem">' + text[x] + '</div>';
+				}else if(x == 16){
+
 				}
 			}
 		}
@@ -339,7 +343,9 @@ function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPla
 		}
 	}
 
-	if(foundIt == 16){
+	if(selected == ''){
+		changeIt = true;
+	}else if(foundIt == 16){
 		/* Has to be Goalie */
 		if(findPlayerInRoster(explode[0],3,league)){changeIt = true;}
 	}else if(foundIt >=17 && foundIt <= 19){

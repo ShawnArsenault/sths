@@ -1,3 +1,40 @@
+#lineeditor ul.positiontabs{
+	font-family: Open Sans;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 16px;
+    margin: 10px 0 0;
+    border-width:0px;
+    border-bottom: 1px solid #ccc;
+    padding: 3px 0px 3px 0 px!important;
+
+    background: transparent none;
+    color: #222222;
+    border-radius: 0px;
+    
+
+}
+#lineeditor ul.positiontabs li {
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    border: 0px solid #d3d3d3;
+    background: transparent none;
+    font-weight: normal;
+    color: #222;
+}
+#lineeditor ul.positiontabs li + li{margin-left:10px;border-width:0px;}
+#lineeditor ul.positiontabs li a{
+background: transparent url("images/arrows.gif") no-repeat scroll center 24px;
+    padding: 2px 10px 10px 10px;
+    text-decoration: none;
+}
+#lineeditor ul.positiontabs li.ui-tabs-active a{
+background: transparent url("images/arrows.gif") no-repeat scroll center bottom;
+    text-decoration: none;
+    font-weight:500;
+}
+
 #lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:160px;height:auto;margin-left:10px;}
 #lineeditor  #tabs .linesection input[type=button]{padding:0px 0px;text-align:center;margin-top:3px;}
 #lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
@@ -20,18 +57,10 @@
 #lineeditor  .up {background-image:url('http://anhs.qc.ca/images/icons/inc.png');margin:2px 0px 0px -4px;}
 #lineeditor  .down {background-image:url('http://anhs.qc.ca/images/icons/dec.png');margin:2px -4px 0px 0px;}
 
-
-/*#lineeditor  #errors{float:right;width:78%;/*border:1px solid #ffedde;}*/
 #lineeditor  #errorheader{font-weight:bold;}
 
 
 #lineeditor  .errorwrapper{padding:10px;overflow:hidden;}
-/*
-#lineeditor  .linescomplete{background-color:#248a1f;}
-#lineeditor  .linesincomplete{background-color:#d04437;}
-#lineeditor  .linesincomplete #errorheader {margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #ffffff;}
-#lineeditor  .linescomplete #errorheader {padding:10px 20px;}
-*/
 #lineeditor  .erroritem{font-size:11px;float:left;margin-right:15px;}
 
 

@@ -1,6 +1,6 @@
 <?php
 	require_once("api/api.php");
-	
+	require_once("fns.php");
 	// exempt is an array of api file names in the api directory.
 	// example, if you do not need the html.php or layout.php api then add as an array item
 	// $exempt = array("html.php","layout.php");
