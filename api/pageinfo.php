@@ -51,6 +51,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 			} // End foreach $player
 		}// End foreach $arrSort
 		//Update the database and save the lines.
+		$db->exec("pragma journal_mode=memory;");
 		$db->exec($sql);
 		$confirmbanner = "<div class=\"confirm\">Lines have been saved.</div>";  
 	} // End if isset($_POST["sbtRoster"])
@@ -259,6 +260,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 	if(isset($_POST["sbtUpdateLines"])){
 		foreach($_POST["txtLine"] AS $line=>$name){
 			// Update the Regular Lines table
+			$db->exec("pragma journal_mode=memory;");
 			$SQL = "UPDATE Team". $_REQUEST["League"] ."Lines SET " . $line . " = '" . sqlite_escape($name) . "' WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
 			$db->exec($SQL);
 			// Update the Numbersonly Lines table.
