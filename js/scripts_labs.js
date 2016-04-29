@@ -111,7 +111,6 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 	    		if(ProTeamEliminatedCannotSendPlayerstoFarm == "true" && isEliminated == "true" && explode[4] >= 2 && status <= 1){playerProToFarmEliminated++;}
 	    		// If flagged properly and player is forced to waivers set up waiver info. Can only do this on Game 1
 	    		if(isWaivers == true && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
-	    			alert("GOT HERE");
 	    			var elem = document.getElementById('line1_'+explode[7]);
 	    			// Add the movetowaiver class to the li
 	    			if(elem.className.match(/\bmovetowaiver\b/)){var me;}else{elem.className = elem.className + " movetowaiver";} 					
