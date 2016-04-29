@@ -7,6 +7,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 	$id = "rostereditor";
 	$confirmbanner = "";
 	$sql = "";
+	$execute = false;
 	// If the Save Lines button has been clicked.
 	if(isset($_POST["sbtRoster"])){
 		// Create an array to organize the information
@@ -18,7 +19,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 		// Loop through the txtRoster array. txtRoster[$nextgame][] = Divider = LINE|LineType, Player = FirstName LastName| Number | PositionNumber | PositionString
 		// Explode at the pipe | 
 		// If the count of the explode is 2 then its a different line
-		// Section.  Switch the vakue of what the status should be
+		// Section.  Switch the value of what the status should be
 		// $_POST["txtRoster"][$game][$status]
 		// $game = int 1-10
 		// $status = int 0-3
@@ -31,28 +32,40 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 					elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
 					else $playerStatus = 0;
 				}else{
-					$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
-					$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
+					if($explodeValue[4] != $playerStatus){
+						// Check to see if the updated player status = what is already in the DB. 
+						// If there is a change, add to the arrSort array.
+						$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
+						$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
+					}	
 				}// End if count($explodeValue)
 			} // End foreach $status
 		} // End foreach $_POST["txtRoster"]
-
+		//pre_r($_POST);
+		// If there is something in the arrSort variable, then:
 		// Loop through the arrSort variable to make 1 individual line of SQL
 		// Per player to update the Status values in the DB.
-		foreach($arrSort AS $table=>$player){
-			foreach($player AS $number=>$statuses){
-				$sql .= "UPDATE " . $table . "Info ";
-				$sql .= "SET ";
-				foreach($statuses AS $status=>$s){
-					$sql .= $status . " = " . $s . ", ";
-				}
-				$sql = rtrim($sql,", ") . " ";
-				$sql .= "WHERE Number = " . $number . ";";
-			} // End foreach $player
-		}// End foreach $arrSort
-		//Update the database and save the lines.
-		$db->exec($sql);
-		$confirmbanner = "<div class=\"confirm\">Lines have been saved.</div>";  
+		if(count($arrSort) > 0){
+			foreach($arrSort AS $table=>$player){
+				foreach($player AS $number=>$statuses){
+					$sql .= "UPDATE " . $table . "Info ";
+					$sql .= "SET ";
+					foreach($statuses AS $status=>$s){
+						$sql .= $status . " = " . $s . ", ";
+					}
+					$sql .= "WebClientModify = 'True' ";
+					$sql .= "WHERE Number = " . $number . ";";
+				} // End foreach $player
+			}// End foreach $arrSort
+			//Update the database and save the lines.
+			$db->exec("pragma journal_mode=memory;");
+			$db->exec($sql);
+			$confirmbannertext = "Roster has been saved."; 
+		}else{
+			$confirmbannertext = "No changes have been made to your roster."; 
+		}
+		
+		$confirmbanner = "<div class=\"confirm\">". $confirmbannertext ."</div>";  
 	} // End if isset($_POST["sbtRoster"])
 	
 	// Get the team selection form from the html API if needed
@@ -253,18 +266,68 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$availableplayers[MakeCSSClass($row["Name"])]["id"] = $row["Number"];
 			$availableplayers[MakeCSSClass($row["Name"])]["Name"] = $row["Name"];
 		}
+
+		// Check to see if Custom OT lines are turned on 
+		$sql = "SELECT " . $league . "CustomOTLines AS CustomLines FROM LeagueGeneral;";
+		$oRS = $db->query($sql);
+		$row = $oRS->fetchArray();
+		$customOTlines = ($row["CustomLines"] == "True") ? true: false;
 	}// end if $teamid
 
+	
+	
 	// If the updatelines submit button is clicked 
 	if(isset($_POST["sbtUpdateLines"])){
-		foreach($_POST["txtLine"] AS $line=>$name){
-			// Update the Regular Lines table
-			$SQL = "UPDATE Team". $_REQUEST["League"] ."Lines SET " . $line . " = '" . sqlite_escape($name) . "' WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
-			$db->exec($SQL);
-			// Update the Numbersonly Lines table.
-			$SQL = "UPDATE Team". $_REQUEST["League"] ."LinesNumberOnly SET " . $line . " = '" . $availableplayers[MakeCSSClass($name)]["id"] . "' WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
-			$db->exec($SQL);
+		$fminfo = "";
+		$dbfields = get_fields($db,$customOTlines);
+		$fmfields = array_merge($_POST["txtLine"],$_POST["txtStrategies"]);
+		$sql = "SELECT " . implode(" || ',' || ", $dbfields) . " AS LineValues FROM Team". $_REQUEST["League"] ."Lines WHERE TeamNumber = " . $_REQUEST["TeamID"] . " AND Day = 1;";
+		$oRS = $db->query($sql);
+		$row = $oRS->fetchArray();
+		$dbinfo = $row["LineValues"];
+		foreach($dbfields AS $f){
+			$fminfo .= $fmfields[$f] . ",";
 		}
+		$fminfo = rtrim($fminfo,",");
+
+		if(trim($fminfo) != trim($dbinfo)){
+			$arrDB = explode(",",$dbinfo);
+			$arrFM = explode(",",$fminfo);
+			
+			// Need 2 running query strings: one for the regular lines table
+			// And one for the numberonly table.
+			// For now this will update all 10 game slots for lines.
+			$sql   = "UPDATE Team". $_REQUEST["League"] ."Lines SET ";
+			$sqlno = "UPDATE Team". $_REQUEST["League"] ."LinesNumberOnly SET ";
+
+			foreach($dbfields AS $i=>$f){
+				if($arrDB[$i] != $arrFM[$i]){
+					if(is_numeric($arrFM[$i])){
+						$val    = sqlite_escape($arrFM[$i]);
+						$valno  = sqlite_escape($arrFM[$i]);
+					}else{
+						$val    = "'" . sqlite_escape($arrFM[$i]) . "'";
+						$valno  = $availableplayers[MakeCSSClass($arrFM[$i])]["id"];
+					}
+					$sql   .= $f . " = " . $val . ", ";
+					$sqlno .= $f . " = " . $valno . ", ";
+				}
+			}
+			
+			$sql = rtrim($sql,", ");
+			$sqlno .= " WebClientModify = 'True' ";
+
+			$sql .= " WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
+			$sqlno .= " WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
+			$db->exec("pragma journal_mode=memory;");
+			$db->exec($sql);
+			$db->exec($sqlno);	
+			$bannertext = "Lines have been saved.";
+			//echo $sql . "<br /><br />" . $sqlno;
+		}else{
+			$bannertext = "No changes have been made.";
+		}
+		?><div class="confirm"><?= $bannertext?></div><?php
 	}// end isset $_POST[sbtUpdateLines]
 
 	// Get the team selection form from the html API if needed ?>
@@ -302,7 +365,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			?>
 			<div class="playerlist">
 				<form name="frmPlayerList">
-					<select size="23" id="sltPlayerList">
+					<select size="25" id="sltPlayerList">
 						<?php 	// Loop through the players and add to the select list.
 							$oRS = $db->query($sql);
 							$first = true;
@@ -312,6 +375,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 								// Separate Name and number with a pipe '|' to split in the javascript.
 								?><option<?= $s?> value="<?= $row["Name"]?>|<?= $row["Number"]?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <?php 
 							}?>
+							<option value="">Remove Player/Goalie</option>
 					</select><!--end sltPlayerList-->
 				</form><!-- end frmPlayerList-->
 			</div><!-- end playerlist-->
@@ -338,103 +402,136 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			<?php  // Start the tabs for pages of lines.?>
 			<div class="linetabs">
 				<div id="tabs">
-					<ul>
+					<ul class="positiontabs">
 						<?php  // loop through the tab names creating clickable tabs. ?>
 						<?php  
 						foreach($tabs AS $i=>$t){
-							?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php 
+							$displaytab = false;
+							if($i != "OT"){$displaytab = true;
+							}elseif($i == "OT" && $customOTlines){$displaytab = true;
+							}else{$displaytab = false;
+							}
+							if($displaytab){?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php }
 						}?>	
 					</ul>
 					<?php $count = 0;?>
 					<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
 						// Loop through the tabs info making the lines pages.
 						foreach($tabs AS $i=>$t){
-							?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?php 
-								if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
-									// Each of the if'ed statements above have the same kind of info. 
-									// display the blocks based on which tabbed page you are on.
-									make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
-								}elseif($i == "Others"){?>
-									<?php // Start with the goalies. ?>
-									<div class="linesection <?= MakeCSSClass($i)?> goalies">
+							$displaytab = false;
+							if($i != "OT"){$displaytab = true;
+							}elseif($i == "OT" && $customOTlines){$displaytab = true;
+							}else{$displaytab = false;
+							}
+							if($displaytab){
+								?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?php 
+									if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
+										// Each of the if'ed statements above have the same kind of info. 
+										// display the blocks based on which tabbed page you are on.
+										make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
+									}elseif($i == "Others"){?>
+										<?php // Start with the goalies. ?>
+										<div class="linesection <?= MakeCSSClass($i)?> goalies">
+											<?php 
+												foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third String") AS $gid=>$g){?>
+													<h4><?= $g?></h4>
+													<div class="blockcontainer">
+														<?php  $row["Goaler" . $gid] = (isset($availableplayers[MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
+														<div class="positionline"><?= "<input class=\"textname\" id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
+													</div><?php 
+												}
+											?>
+										</div><!-- end linesection <?= MakeCSSClass($i)?> goalies-->
 										<?php 
-											foreach(array(1=>"Starting Goalie",2=>"Backup Goalie") AS $gid=>$g){?>
-												<h4><?= $g?></h4>
-												<div class="blockcontainer">
-													<?php  $row["Goaler" . $gid] = (isset($availableplayers[MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
-													<div class="<?php  MakeCSSClass($g)?>"><?= "<input id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
-												</div><?php 
-											}
-										?>
-									</div><!-- end linesection <?= MakeCSSClass($i)?> goalies-->
-									<?php 
-									// Get the other page fields needed for the blocks.
-									$field = get_line_arrays("otherfield");
+										// Get the other page fields needed for the blocks.
+										$field = get_line_arrays("otherfield");
 
-									// Make the extra forwards and extra defense.
-									foreach($field["start"] AS $fsid=>$fs){?>
-										<div class="linesection <?= MakeCSSClass($i)?> extra <?= $fs?>">
-											<h4>Extra <?= $fs?></h4>
-											<div class="blockcontainer">
-												<?php foreach($field["end"] AS $feid=>$fe){
-													$usefield = "Extra" .$fsid . $fe;
-													if(array_key_exists($usefield, $row)){?>
-														<div class="positionline">
-															<div class="positionlabel"><?= $fe?></div>
-															<div class="positionname">
-																<?php  $row[$usefield] = (isset($availableplayers[MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
-																<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
-															</div>
-														</div><?php 
-													}
-												}?>
-											</div><!--end blockcontainer -->
-										</div><!-- end linesection <?= MakeCSSClass($i)?> extra <?= $fs?>--><?php 
-									}?>
-									<?php // Make the penalty shots order?>
-									<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
-										<h4>Penalty Shots</h4>
-										<div class="blockcontainer">								
-											<div class="penaltyshot">
-												<?php  for($x=1;$x<6;$x++){?>
-												<div class="positionline">
-													<div class="positionname">
-														<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
-														<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
-													</div>	
-												</div>
-												<?php }?>
-											</div>
-										</div><!-- end blockcontainer-->
-									</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots-->
-									<?php 
-								}else{
-									// Make the Offsensive and Defensive Lines.
-									$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
-									foreach($types AS $tid=>$t){?>
-										<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
-											<h4><?= $t?></h4>
-											<div class="blockcontainer"><?php 
-												$fordef = array("Forward", "Defense");
-												foreach($fordef AS $fd){
-													foreach($positions[$fd] AS $pid=>$pos){
-														$usefield = "LastMin" . $tid . $fd . $pid;
-														if(array_key_exists($usefield, $row)){
-															?>
+										// Make the extra forwards and extra defense.
+										foreach($field["start"] AS $fsid=>$fs){?>
+											<div class="linesection <?= MakeCSSClass($i)?> extra <?= $fs?>">
+												<h4>Extra <?= $fs?></h4>
+												<div class="blockcontainer">
+													<?php foreach($field["end"] AS $feid=>$fe){
+														$usefield = "Extra" .$fsid . $fe;
+														if(array_key_exists($usefield, $row)){?>
 															<div class="positionline">
-																<div class="positionlabel"><?= $pos?></div>
+																<div class="positionlabel"><?= $fe?></div>
 																<div class="positionname">
-																	<?= "<input id=\"". $usefield ."\" onclick=\"ChangePlayer('". $usefield ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $usefield ."]\" value=\"". $row[$usefield] ."\">";?>
+																	<?php  $row[$usefield] = (isset($availableplayers[MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
+																	<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
 																</div>
 															</div><?php 
 														}
-													}
-												}?>
+													}?>
+												</div><!--end blockcontainer -->
+											</div><!-- end linesection <?= MakeCSSClass($i)?> extra <?= $fs?>--><?php 
+										}?>
+										<?php // Make the penalty shots order?>
+										<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
+											<h4>Penalty Shots</h4>
+											<div class="blockcontainer">								
+												<div class="penaltyshot">
+													<?php  for($x=1;$x<6;$x++){?>
+													<div class="positionline">
+														<div class="positionname">
+															<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
+															<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
+														</div>	
+													</div>
+													<?php }?>
+												</div>
 											</div><!-- end blockcontainer-->
-										</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots--><?php 
+										</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots-->
+										<?php
+									}else if($i == "OT"){ 
+										foreach(array(10=>"Forward",5=>"Defense") AS $i=>$p){
+										?><div class="linesection ot ot<?= $p?>">
+											<h4><?= $p?></h4>
+											<div class="blockcontainer">
+												<?php
+												for($x=1;$x<=$i;$x++){
+													?>
+													<div class="positionline">
+														<div class="positionlabel"><?= $x?>.</div>
+														<div class="positionname">
+															<input class="textname" id="OT<?= $p.$x;?>" onclick="ChangePlayer('OT<?= $p.$x;?>','<?= $league ?>',<?=$cpfields?>);"  readonly type="text" name="txtLine[OT<?=$p.$x;?>]" value="<?= $row["OT". $p.$x]; ?>">
+														</div>
+													</div><?php
+												}
+												?>
+											</div>
+										<?php
+
+										?></div><?php	
+										}
+									}else{
+										// Make the Offsensive and Defensive Lines.
+										$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
+										foreach($types AS $tid=>$t){?>
+											<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
+												<h4><?= $t?></h4>
+												<div class="blockcontainer"><?php 
+													$fordef = array("Forward", "Defense");
+													foreach($fordef AS $fd){
+														foreach($positions[$fd] AS $pid=>$pos){
+															$usefield = "LastMin" . $tid . $fd . $pid;
+															if(array_key_exists($usefield, $row)){
+																?>
+																<div class="positionline">
+																	<div class="positionlabel"><?= $pos?></div>
+																	<div class="positionname">
+																		<?= "<input id=\"". $usefield ."\" onclick=\"ChangePlayer('". $usefield ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $usefield ."]\" value=\"". $row[$usefield] ."\">";?>
+																	</div>
+																</div><?php 
+															}
+														}
+													}?>
+												</div><!-- end blockcontainer-->
+											</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots--><?php 
+										}
 									}
-								}
-							?></div><!-- end tabs-<?= $count ?>--><?php 
+								?></div><!-- end tabs-<?= $count ?>--><?php 
+							}
 						}?>
 						<input id="linesubmit" type="submit" value="Update Lines" name="sbtUpdateLines">
 					</form>
@@ -513,19 +610,34 @@ function make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
 	<?php $use = ($strat) ? "Strat" : "Time";?>
 	<?php $id = $field . $sid; ?>
 	<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="">
-	<input readonly size="1" id="<?= $id?>" class="stratval" type="text" name="txtStartegies[<?= $id ?>]" value="<?= $row[$id] ?>">
+	<input readonly size="1" id="<?= $id?>" class="stratval" type="text" name="txtStrategies[<?= $id ?>]" value="<?= $row[$id] ?>">
 	<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="">
 	<?php 
 }
+function get_fields($db,$customOTlines){
+	// Make an array of field names in the DB.
+	$sql = "PRAGMA table_info(Team". $_REQUEST["League"] ."Lines);";
+	$oRS = $db->query($sql);
+	$count = 0;
+	$addfield = false;
+	while($row = $oRS->fetchArray()){
+		if($row["name"] != "TeamNumber" && $row["name"] != "Day"){
+			$fields[$count++] = $row["name"];
+		}
+	}
+	if(!$customOTlines){$fields = array_diff($fields,get_line_arrays("otfields"));}
+	return $fields;
+}
 function get_line_arrays($type="blocks"){
 	// This returns an array of needed information.
-	$arr["tabs"] = array("Forward"=>"Forward","Defense"=>"Defense","PP"=>"PP","4VS4"=>"4vs4","PK4"=>"PK4","PK3"=>"PK3","Others"=>"Others","LastMin"=>"Last Min");
+	$arr["tabs"] = array("Forward"=>"Forward","Defense"=>"Defense","PP"=>"PP","4VS4"=>"4vs4","PK4"=>"PK4","PK3"=>"PK3","Others"=>"Others","LastMin"=>"Last Min","OT"=>"Overtime");
 	$arr["blocks"]["Forward"] = array("line1"=>"Lines #1","line2"=>"Lines #2","line3"=>"Lines #3","line4"=>"Lines #4");
 	$arr["blocks"]["Defense"] = array("pair1"=>"Pair #1","pair2"=>"Pair #2","pair3"=>"Pair #3","pair4"=>"Pair #4");
 	$arr["blocks"]["PP"] = array("ppline1"=>"PP Lines #1","ppline2"=>"PP Lines #2","pppair1"=>"PP Pair #1","pppair2"=>"PP Pair #2");
 	$arr["blocks"]["4VS4"] = array("4vs4line1"=>"4 vs 4 Lines #1","4vs4line2"=>"4 vs 4 Lines #2","4vs4pair1"=>"4 vs 4 Pair #1","4vs4pair2"=>"4 vs 4 Pair #2");
 	$arr["blocks"]["PK4"] = array("pk4line1"=>"PK4 Lines #1","pk4line2"=>"PK4 Lines #2","pk4pair1"=>"PK4 Pair #1","pk4pair2"=>"PK4 Pair #2");
 	$arr["blocks"]["PK3"] = array("pk3line1"=>"PK3 Lines #1","pk3line2"=>"PK3 Lines #2","pk3pair1"=>"PK3 Pair #1","pk3pair2"=>"PK3 Pair #2");
+	$arr["blocks"]["OT"] = array("forwards"=>"Forwards","defense"=>"Defense");
 
 	$arr["positions"]["Forward"] = array("Center"=>"C","LeftWing"=>"LW","RightWing"=>"RW");
 	$arr["positions"]["Forward3"] = array("Center"=>"F");
@@ -536,6 +648,7 @@ function get_line_arrays($type="blocks"){
 	$arr["otherfield"]["start"] = array("Forward"=>"Forwards","Defense"=>"Defensemen");
 	$arr["otherfield"]["end"] = array("N1","N2","N3","PP1","PP2","PK","PP","PK1","PK2");
 
+	$arr["otfields"] = array("OTForward1", "OTForward2","OTForward3","OTForward4","OTForward5","OTForward6","OTForward7","OTForward8","OTForward9","OTForward10","OTDefense1","OTDefense2","OTDefense3","OTDefense4","OTDefense5");
 	return $arr[$type];
 }
 ?>

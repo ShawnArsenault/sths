@@ -110,6 +110,7 @@ function script_team_array($db,$filename){
 	$j .= "}\n\n";
 	
 	file_put_contents($filename, $j);
+	chmod($filename, 0664);
 
 }
 ?>
