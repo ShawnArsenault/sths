@@ -62,7 +62,7 @@ function layout_header($id=false,$db=false){
 		</head>
 	<?php
 	// Start the Body, add an onload function if set above.
-	?><body<?= (isset($onload)) ? $onload : "";?>><?php
+	?><body<?= (isset($onload)) ? $onload : "";?>>GOT HERE<?php
 }
 
 function layout_footer(){
@@ -70,6 +70,7 @@ function layout_footer(){
 }
 
 function script_team_array($db,$filename){
+	echo "GOT HERE";
 	$file = @fopen($filename,"r+");
 	@ftruncate($file, 0);
 	$pos = array(0=>"C",1=>"LW",2=>"RW",3=>"D",4=>"G",);
@@ -110,7 +111,7 @@ function script_team_array($db,$filename){
 	$j .= "}\n\n";
 	
 	file_put_contents($filename, $j);
-	chmod($filename, 0664);
+	//chmod($filename, 0664);
 
 }
 ?>

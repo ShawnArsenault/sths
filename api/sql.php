@@ -226,7 +226,7 @@ function sql_roster_editor_fields($teamid){
 		if($f == "isAfterTradeDeadline"){
 			$sql .= "(SELECT CASE WHEN ScheduleNextDay/ProScheduleTotalDay*100 >= TradeDeadline THEN 'True' ELSE 'False' END FROM LeagueGeneral) AS ". $f .", ";
 		}elseif($f == "isWaivers"){
-			$sql .= "(SELECT CASE WHEN (SELECT l.WaiversEnable FROM LeagueSimulation AS l) = 'True' AND ScheduleNextDay/ProScheduleTotalDay*100 >= WaiverDeadline THEN 'True' ELSE 'False' END FROM LeagueGeneral) AS ". $f .", ";
+			$sql .= "(SELECT CASE WHEN (SELECT l.WaiversEnable FROM LeagueSimulation AS l) = 'True' AND ScheduleNextDay/ProScheduleTotalDay*100 <= WaiverDeadline THEN 'True' ELSE 'False' END FROM LeagueGeneral) AS ". $f .", ";
 		}elseif($f == "isEliminated"){
 			$sql .= "(SELECT PlayOffEliminated FROM TeamProInfo WHERE Number = " . $teamid . ") AS ". $f .", ";
 		}elseif($f == "GamesLeft"){
