@@ -323,7 +323,6 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$db->exec($sql);
 			$db->exec($sqlno);	
 			$bannertext = "Lines have been saved.";
-			//echo $sql . "<br /><br />" . $sqlno;
 		}else{
 			$bannertext = "No changes have been made.";
 		}
