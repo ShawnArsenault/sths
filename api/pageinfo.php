@@ -360,22 +360,37 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$sql .= "UNION ";
 			$sql .= sql_players_base("Goaler",$isPro);
 			$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
-			$sql .= "ORDER BY PositionNumber, Overall, Name ";
+			$sql .= "ORDER BY PositionNumber, Overall DESC, Name ";
 			?>
+			
 			<div class="playerlist">
+				<div class="positionlist">
+					<label><input onchange="update_position_list();" type="checkbox" id="posC" name="position" class="position" checked>C</label>
+					<label><input onchange="update_position_list();" type="checkbox" id="posLW" name="position" class="position" checked>LW</label>
+					<label><input onchange="update_position_list();" type="checkbox" id="posRW" name="position" class="position" checked>RW</label>
+					<label><input onchange="update_position_list();" type="checkbox" id="posD" name="position" class="position" checked>D</label>
+					<label><input onchange="update_position_list();" type="checkbox" id="posG" name="position" class="position" checked>G</label>
+				</div>
 				<form name="frmPlayerList">
-					<select size="25" id="sltPlayerList">
-						<?php 	// Loop through the players and add to the select list.
-							$oRS = $db->query($sql);
-							$first = true;
-							while($row = $oRS->fetchArray()){
-								//if its the first item in the loop, select the item as default.
-								if($first){$s = " selected";$first = false;}else{$s = "";}
-								// Separate Name and number with a pipe '|' to split in the javascript.
-								?><option<?= $s?> value="<?= $row["Name"]?>|<?= $row["Number"]?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <?php 
-							}?>
-							<option value="">Remove Player/Goalie</option>
-					</select><!--end sltPlayerList-->
+					<ul class="playerselect">
+					<?php 	// Loop through the players and add to the select list.
+					$oRS = $db->query($sql);
+					$first = true;
+					while($row = $oRS->fetchArray()){
+						//if its the first item in the loop, select the item as default.
+						if($first){$s = " checked";$first = false;}else{$s = "";}
+						// Separate Name and number with a pipe '|' to split in the javascript.
+						?>
+						<li id="row-<?= MakeCSSClass($row["Name"])?>" class="option">
+							<input name="sltPlayerList" type="radio" id="a<?= MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $row["Name"]?>|<?= $row["Number"]?>|<?= MakeCSSClass($row["Name"])?>|<?= $row["PositionString"];?>">
+							<label for="a<?= MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</label>
+						</li><?php 
+					}?>
+					<li class="option">
+						<input name="sltPlayerList" type="radio" id="aRemove" value="">
+						<label for="aRemove">Remove Player/Goalie</label>
+					</li>
+					</ul>
 				</form><!-- end frmPlayerList-->
 			</div><!-- end playerlist-->
 			<?php 

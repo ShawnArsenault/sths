@@ -189,7 +189,6 @@ function isDuplicates(arr1,x){
 
 	return ret;
 }
-
 function verifyLines(){
 	var errortext = "";
 	var section = getSections();
@@ -245,8 +244,6 @@ function verifyStrat(){
 	
 	return errortext;
 }
-
-
 function verifyTime(){
 	
 	var errortext = '';
@@ -327,7 +324,7 @@ function findPlayerInRoster(selected,type,league){
 	return foundIt;
 }
 function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
-	var selected = document.getElementById('sltPlayerList').value;
+	var selected = document.querySelector('input[name="sltPlayerList"]:checked').value;
 	var explode = selected.split("|");
 	var groups = getGroups();
 	
@@ -367,7 +364,6 @@ function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPla
 						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond);
 	};
 }
-
 function verifyBlockPlayerFromPlaying(Lines12,Lines123,Lines12inPPPK){
 	var errortext = '';
 	if(Lines12 || Lines123){
@@ -462,4 +458,35 @@ function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLine
 
 	document.getElementById('errors').innerHTML = display;	
 	document.getElementById("linesubmit").disabled = disabled;
+}
+function update_position_list(){
+	var expval;
+	var exppos;
+	var checkedValue = null; 
+	var positions = ['C','LW','RW','D','G'];
+	var pos = [];
+	var pcount = 0;
+	var inputElements = document.getElementsByClassName('position');
+	for(var i=0; inputElements[i]; ++i){
+		if(inputElements[i].checked){
+		   pos[pcount++] = positions[i];
+		}
+	}
+
+	var elements = document.getElementsByName('sltPlayerList');
+	for (i=0;i<elements.length;i++) {
+		expval = elements[i].value.split('|');
+		if(expval.length > 1){
+			exppos = expval[3].split(',');
+			for (p=0;p<exppos.length;p++) {
+				if(inArray(exppos[p],pos)){
+					document.getElementById("row-"+expval[2]).style.display = "inline";
+					break;
+				}else{
+					// display none for li
+					document.getElementById("row-"+expval[2]).style.display = "none";
+				}
+			}
+		}
+	}
 }

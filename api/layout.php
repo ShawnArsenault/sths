@@ -9,6 +9,10 @@ function layout_header($id=false,$db=false){
 			<meta name="keywords" content="STHS, Fantasy, Hockey, Simulator" />
 			<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 			<meta name="viewport" content="width=device-width" />
+			<meta http-equiv="cache-control" content="max-age=0" />
+			<meta http-equiv="cache-control" content="no-cache" />
+			<meta http-equiv="expires" content="0" />
+			<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 			<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 			<link rel="stylesheet" href="css/labs.css">
 				<?php 
