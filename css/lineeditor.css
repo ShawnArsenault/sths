@@ -63,7 +63,7 @@ background: transparent url("images/arrowactive.png") no-repeat scroll center bo
 #lineeditor  .errorwrapper{padding:10px;overflow:hidden;}
 #lineeditor  .erroritem{font-size:11px;float:left;margin-right:15px;}
 
-
+#lineeditor .goalies .blockcontainer{margin-bottom:8px;}
 
 .linetabs .tabcontainer{overflow:hidden;}
 .linetabs h4{background-color: #e8e8e8;

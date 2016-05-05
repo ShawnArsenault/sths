@@ -48,19 +48,10 @@ function layout_header($id=false,$db=false){
 			?>
 			<?php
 				if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
-					//$onload = " onload=\"checkCompleteLines();\"";
 					$jsfunction = js_function_line_validator($db);
 					$onload = " onLoad=\"". $jsfunction ."\"";
-					$filename = "onthefly-Team" . $_REQUEST["TeamID"] .".js";
-					$pathabsolute = $_SERVER["DOCUMENT_ROOT"] . "js/". $filename . "";
-					$pathrelative = "js/".$filename;
 					
-					if(!file_exists($pathabsolute)){
-						touch($pathrelative);
-					}
-
-					script_team_array($db,$pathrelative);?>
-					<script type="text/javascript" src="<?=$pathrelative;?>?<?= time();?>"></script><?php 
+					echo script_team_array($db); 
 				}
 			?>
 		</head>
@@ -73,9 +64,8 @@ function layout_footer(){
 	?></body></html><?php
 }
 
-function script_team_array($db,$filename){
-	$file = @fopen($filename,"r+");
-	@ftruncate($file, 0);
+function script_team_array($db){
+	
 	$pos = array(0=>"C",1=>"LW",2=>"RW",3=>"D",4=>"G",);
 	$position = array();
 	foreach(array(3=>"Pro",1=>"Farm") AS $status=>$league){
@@ -98,8 +88,8 @@ function script_team_array($db,$filename){
 			}
 		}
 	}
-
-	$j = "function make_position_list(){\n";
+	$j = "<script>";
+	$j .= "function make_position_list(){\n";
 	$j .= "var pos = [];\n";
 	$j .= "pos[0] = [];\n";
 	$j .= "pos[1] = [];\n";
@@ -112,8 +102,9 @@ function script_team_array($db,$filename){
 	
 	$j .= "return pos;\n";
 	$j .= "}\n\n";
+	$j .= "</script>";
+
+	return $j;
 	
-	file_put_contents($filename, $j);
-	chmod($filename, 0664);
 }
 ?>
