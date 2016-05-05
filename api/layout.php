@@ -14,6 +14,7 @@ function layout_header($id=false,$db=false){
 			<meta http-equiv="expires" content="0" />
 			<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
 			<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+			<link rel="stylesheet" href="css/required.css">
 			<link rel="stylesheet" href="css/labs.css">
 				<?php 
 				// Using the $id paramater, check if there is a css file with that name to use for this page only. 
@@ -54,6 +55,7 @@ function layout_header($id=false,$db=false){
 					echo script_team_array($db); 
 				}
 			?>
+
 		</head>
 	<?php
 	// Start the Body, add an onload function if set above.

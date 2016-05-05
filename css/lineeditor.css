@@ -63,7 +63,7 @@ background: transparent url("images/arrowactive.png") no-repeat scroll center bo
 #lineeditor  .errorwrapper{padding:10px;overflow:hidden;}
 #lineeditor  .erroritem{font-size:11px;float:left;margin-right:15px;}
 
-#lineeditor .goalies .blockcontainer{margin-bottom:8px;}
+#lineeditor .goalies .blockcontainer{margin-bottom:5px;}
 
 .linetabs .tabcontainer{overflow:hidden;}
 .linetabs h4{background-color: #e8e8e8;
@@ -89,56 +89,10 @@ background: transparent url("images/arrowactive.png") no-repeat scroll center bo
 .linetabs .timevalue{float:left;width:20px;}
 .linetabs .startinggoalie{margin-bottom:10px;}
 
-.positionlist{border-bottom:1px solid #999999;background-color:#cccccc;color:#333;padding:3px;font-size:0.9vw;margin-bottom:3px;}
-.positionlist label{margin-right:1.0vw;}
 
 .smalllist{font-size:0.7vw;padding-left:0.4vw;font-style: italic;}
 
-.playerlist{overflow:hidden;}
 
-.playerlist .playerselect {
-	list-style-type:none;
-	margin:0px 0 0 0;
-	padding:0;
-	overflow:hidden;
-}
-
-.playerlist .playerselect li {
-    float:left;
-    margin:0 0px 0px 0;
-    padding:6px 0px 0px 0px;
-    position:relative;
-    width:100%;
-    height:16px;
-    border-radius:3px;
-}
-
-.playerlist .playerselect li + li{
-	border-top: 1px dotted #cccccc;
-}
-
-.playerlist .playerselect label, .playerlist .playerselect input {
-    display:block;
-    position:absolute;
-    top:0px;
-    left:0;
-    right:0;
-    bottom:0;
-    padding:4px 0px 0px 6px;
-}
-
-
-.playerlist .playerselect input[type="radio"] {
-    opacity:0.01;
-    z-index:100;
-}
-
-.playerlist .playerselect input[type="radio"]:checked + label,
-.playerlist .Checked + label {
-    background:#666666;
-    color:#fff;
-    font-weight:bold;
-}
 
 
 @media screen and (max-width: 80em) {
@@ -154,11 +108,7 @@ background: transparent url("images/arrowactive.png") no-repeat scroll center bo
 	    width: 96%;
 	}
 
-	.playerlist .playerselect li {font-size: 1.3vw;height:1.3vw;}	
-	.playerlist .playerselect label, .playerlist .playerselect input {
-	    padding:0.4vw 0px 0px 6px;
-
-	}
+	
 
 	#lineeditor ul.positiontabs li a{
 		background: transparent url("images/arrows.gif") no-repeat scroll center 3.3vw;
@@ -189,8 +139,7 @@ background: transparent url("images/arrowactive.png") no-repeat scroll center bo
 	.linetabs .strats{float:none;}
 	.linetabs #tabs li{font-size:1.3vw;}
 
-    .positionlist input[type=checkbox]{width:1.3vw;padding:0px;margin:0px;}
-    .positionlist label{margin:-6px 0.5vw 0px 0px;font-size:1.2vw;}
+    
 	
 }
 

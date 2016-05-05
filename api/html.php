@@ -27,5 +27,16 @@ function html_form_teamid($db,$farm=false){
 	</form>
 	<?php
 }
+function html_checkboxes_positionlist($elementName,$byName="true",$display="inline"){
+	?>
+	<div class="positionlist">
+		<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posC" name="position" class="position" checked>C</label>
+		<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posLW" name="position" class="position" checked>LW</label>
+		<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posRW" name="position" class="position" checked>RW</label>
+		<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posD" name="position" class="position" checked>D</label>
+		<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posG" name="position" class="position" checked>G</label>
+	</div>
+	<?php
+}
 
 ?>

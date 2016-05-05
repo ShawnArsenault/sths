@@ -11,4 +11,16 @@ function fields_line_editor_setup(){
 					"ProForceGameStrategiesTo","ProForceGameStrategiesAt5","FarmForceGameStrategiesTo","FarmForceGameStrategiesAt5",
 					"PullGoalerMinGoal","PullGoalerMinPct","PullGoalerRemoveGoaliesSecond");
 }
+function fields_input_values($row){
+	$value = $row["Name"] ."|";
+	$value .= $row["Number"] ."|";
+	$value .= $row["PositionNumber"]."|";
+	$value .= $row["PositionString"] ."|";
+	$value .= $row["Status1"] . "|";
+	$value .= $row["Overall"] . "|";
+	$value .= strtolower($row["ForceWaiver"]) . "|";
+	$value .= MakeCSSClass($row["Name"]);
+
+	return $value;
+}
 ?>

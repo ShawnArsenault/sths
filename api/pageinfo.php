@@ -90,19 +90,19 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 			}// End foreach array(Player,Goalie)
 
 			$sql = rtrim($sql,"UNION ") . " ";
-			$sql .= "ORDER BY PositionNumber, Overall DESC";
+			$sql .= "ORDER BY Name ASC, Overall DESC";
 			$oRS = $db->query($sql);
 
 			// Loop through queries result and add values to new array to display players and goalies
 			while($row = $oRS->fetchArray()){
 				// Loop s for each status on each player
-				for($s=1;$s<=10;$s++){
+				for($s=1;$s<=1;$s++){
 					$status[$s][$row["Status".$s]][$row["Number"]]["Number"] = $row["Number"];
 					$status[$s][$row["Status".$s]][$row["Number"]]["Name"] = $row["Name"];
 					$status[$s][$row["Status".$s]][$row["Number"]]["Injury"] = $row["Injury"];
 					$status[$s][$row["Status".$s]][$row["Number"]]["PositionString"] = $row["PositionString"];
 					$status[$s][$row["Status".$s]][$row["Number"]]["PositionNumber"] = $row["PositionNumber"];
-					$status[$s][$row["Status".$s]][$row["Number"]]["Status"] = $row["Status".$s];
+					$status[$s][$row["Status".$s]][$row["Number"]]["Status1"] = $row["Status".$s];
 					$status[$s][$row["Status".$s]][$row["Number"]]["Overall"] = $row["Overall"];
 					$status[$s][$row["Status".$s]][$row["Number"]]["ForceWaiver"] = $row["ForceWaiver"];
 				} // End for loop for statuses
@@ -143,6 +143,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 
 			// start the form to submit the roster.
 			?>
+			
 			<form name="frmRosterEditor" method="POST" id="frmRoster">
 				<?php 
 					foreach(dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
@@ -167,6 +168,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 						<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
 						<div>
 							<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
+							<?php html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
 							<div class="columnwrapper"><?php 
 								for($x=3;$x>=0;$x--){
 									if($x == 3){
@@ -208,14 +210,7 @@ function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 																// Use a hidden field in the form to get the info to save to the SQLite DB.
 																// The value of the hidden field is a string separated by pipes (|) to parse
 																// on submit "fieldName|fieldNumber|positionNumber(1-16)|positionString(C,LW)"
-																$value = $s["Name"] ."|";
-																$value .= $s["Number"] ."|";
-																$value .= $s["PositionNumber"]."|";
-																$value .= $s["PositionString"] ."|";
-																$value .= $s["Status"] . "|";
-																$value .= $s["Overall"] . "|";
-																$value .= strtolower($s["ForceWaiver"]) . "|";
-																$value .= MakeCSSClass($s["Name"]);
+																$value = fields_input_values($s);
 																?>
 																<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
 																<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
@@ -364,13 +359,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			?>
 			
 			<div class="playerlist">
-				<div class="positionlist">
-					<label><input onchange="update_position_list();" type="checkbox" id="posC" name="position" class="position" checked>C</label>
-					<label><input onchange="update_position_list();" type="checkbox" id="posLW" name="position" class="position" checked>LW</label>
-					<label><input onchange="update_position_list();" type="checkbox" id="posRW" name="position" class="position" checked>RW</label>
-					<label><input onchange="update_position_list();" type="checkbox" id="posD" name="position" class="position" checked>D</label>
-					<label><input onchange="update_position_list();" type="checkbox" id="posG" name="position" class="position" checked>G</label>
-				</div>
+				<?php html_checkboxes_positionlist("sltPlayerList","true","inline"); ?>
 				<form name="frmPlayerList">
 					<ul class="playerselect">
 					<?php 	// Loop through the players and add to the select list.
@@ -380,9 +369,10 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 						//if its the first item in the loop, select the item as default.
 						if($first){$s = " checked";$first = false;}else{$s = "";}
 						// Separate Name and number with a pipe '|' to split in the javascript.
+						$values = fields_input_values($row);
 						?>
-						<li id="row-<?= MakeCSSClass($row["Name"])?>" class="option">
-							<input name="sltPlayerList" type="radio" id="a<?= MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $row["Name"]?>|<?= $row["Number"]?>|<?= MakeCSSClass($row["Name"])?>|<?= $row["PositionString"];?>">
+						<li id="line1_<?= MakeCSSClass($row["Name"])?>" class="option">
+							<input name="sltPlayerList" type="radio" id="a<?= MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
 							<label for="a<?= MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</label>
 						</li><?php 
 					}?>
@@ -487,6 +477,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 												<div class="penaltyshot">
 													<?php  for($x=1;$x<6;$x++){?>
 													<div class="positionline">
+														<div class="positionlabel"><?= $x ?>.</div>
 														<div class="positionname">
 															<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
 															<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
