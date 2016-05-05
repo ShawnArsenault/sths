@@ -360,7 +360,7 @@ function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 			$sql .= "UNION ";
 			$sql .= sql_players_base("Goaler",$isPro);
 			$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
-			$sql .= "ORDER BY PositionNumber, Overall DESC, Name ";
+			$sql .= "ORDER BY Name ASC, Overall DESC ";
 			?>
 			
 			<div class="playerlist">
