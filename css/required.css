@@ -46,8 +46,8 @@
 
 @media screen and (max-width: 80em) {
     .playerlist .playerselect li {font-size: 1.3vw;height:1.3vw;}   
-    .playerlist .playerselect label, .playerlist .playerselect input {
-        padding:0.4vw 0px 0px 6px;
-
-    }
+    .playerlist .playerselect label, .playerlist .playerselect input {padding:0.4vw 0px 0px 6px;}
+    .positionlist input[type=checkbox]{width:1.3vw;padding:0px;margin:0px;}
+    .positionlist label{margin:-6px 0.5vw 0px 0px;font-size:1.2vw;}
 }
+

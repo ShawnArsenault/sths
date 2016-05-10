@@ -1,13 +1,13 @@
 <?php
-	require_once("api/api.php");
-	require_once("fns.php");
-	// exempt is an array of api file names in the api directory.
-	// example, if you do not need the html.php or layout.php api then add as an array item
-	// $exempt = array("html.php","layout.php");
+	require_once("WebClientAPI.php");
+	// exempt is an array of api names.
+	// example, if you do not need the html or layout api then add as an array item
+	// $exempt = array("html","layout");
 	$exempt = array();
+	
 	// Call the required APIs
-	requires($exempt);
-
+	load_apis($exempt);
+	
 	// Make a connection variable to pass to API
 	$db = sqlite_connect("ANHS-STHS.db");
 
@@ -16,6 +16,7 @@
 
 	// Look for a team ID in the URL, if non exists use 0
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
+
 
 	// Display the roster editor page using API.
 	pageinfo_editor_roster($db,$t);
