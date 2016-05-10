@@ -111,6 +111,14 @@ function load_api_html(){
 }
 
 function load_api_jquery(){
+	function jquery_call_jquery(){
+		?>
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script> <!-- Load in JQuery -->
+		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script><!-- Load in JQuery UI -->
+		<script src="js/jquery.ui.touch-punch.min.js"></script><!-- Load in JQuery Needed for mobile devices -->
+		<script src="js/jquery.labs.js"></script><!-- Load in JQuery from Labs -->
+		<?php
+	}
 	function jquery_roster_editor_draggable($jsfunction){?>
 		<script>
 		$(function() {
@@ -181,15 +189,13 @@ function load_api_layout(){
 					}?>
 
 				<script src="js/scripts_labs.js"></script><!-- Load in the scripts needed from labs -->
-				<script src="http://code.jquery.com/jquery-1.9.1.js"></script> <!-- Load in JQuery -->
-				<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script><!-- Load in JQuery UI -->
-				<script src="js/jquery.ui.touch-punch.min.js"></script><!-- Load in JQuery Needed for mobile devices -->
-				<script src="js/jquery.labs.js"></script><!-- Load in JQuery from Labs -->
+				
 				<?php
 					// Check for $id for rostereditor page. 
 					// If we are on the roster editor page, the body tage needs an onload function to validate the rosters at default.
 					// If so and a team is selected, create the onload attribute with the js_function_roster_validator to placein the body tag. 
 					if($id == "rostereditor" && array_key_exists("TeamID", $_REQUEST)){  
+						jquery_call_jquery();
 						$jsfunction = js_function_roster_validator($db,$_REQUEST["TeamID"]);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						// Add the jquery for draggable columns.
@@ -198,6 +204,7 @@ function load_api_layout(){
 				?>
 				<?php
 					if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
+						jquery_call_jquery();
 						$jsfunction = js_function_line_validator($db);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						
