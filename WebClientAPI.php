@@ -267,237 +267,238 @@ function load_api_layout(){
 
 function load_api_pageinfo(){
 	function api_pageinfo_editor_roster($db,$teamid,$showDropdown=true){
-		// $db = sqlite DB
-		// $teamid is a teamid to use that teams roster.
-		// $showDropdown is a flag if you want to toggle between teams.
+		$id = "rostereditor";?>
+		<div id="<?= $id ?>">
+			<div class="pagewrapper pagewrapper<?= $id ?>"><?php 
+				// $db = sqlite DB
+				// $teamid is a teamid to use that teams roster.
+				// $showDropdown is a flag if you want to toggle between teams.
 
-		$id = "rostereditor";
-		$confirmbanner = "";
-		$sql = "";
-		$execute = false;
-		// If the Save Lines button has been clicked.
-		if(isset($_POST["sbtRoster"])){
-			// Create an array to organize the information
-			// $arrSort[$table][$playerid][$status]
-			// 		$table = Player or Goalie
-			// 		$playerid = Player Number from PlayerInfo Table
-			// 		$status = selected status for that game. 
-			$arrSort = array();
-			// Loop through the txtRoster array. txtRoster[$nextgame][] = Divider = LINE|LineType, Player = FirstName LastName| Number | PositionNumber | PositionString
-			// Explode at the pipe | 
-			// If the count of the explode is 2 then its a different line
-			// Section.  Switch the value of what the status should be
-			// $_POST["txtRoster"][$game][$status]
-			// $game = int 1-10
-			// $status = int 0-3
-			foreach($_POST["txtRoster"] AS $statuses=>$status){
-				foreach($status AS $s){
-					$explodeValue = explode("|",$s);
-					if(count($explodeValue) == 2){
-						if($explodeValue[1] == "ProDress")$playerStatus = 3;
-						elseif($explodeValue[1] == "ProScratch") $playerStatus = 2;
-						elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
-						else $playerStatus = 0;
-					}else{
-						if($explodeValue[4] != $playerStatus){
-							// Check to see if the updated player status = what is already in the DB. 
-							// If there is a change, add to the arrSort array.
-							$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
-							$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
-						}	
-					}// End if count($explodeValue)
-				} // End foreach $status
-			} // End foreach $_POST["txtRoster"]
-			//pre_r($_POST);
-			// If there is something in the arrSort variable, then:
-			// Loop through the arrSort variable to make 1 individual line of SQL
-			// Per player to update the Status values in the DB.
-			if(count($arrSort) > 0){
-				foreach($arrSort AS $table=>$player){
-					foreach($player AS $number=>$statuses){
-						$sql .= "UPDATE " . $table . "Info ";
-						$sql .= "SET ";
-						foreach($statuses AS $status=>$s){
-							$sql .= $status . " = " . $s . ", ";
-						}
-						$sql .= "WebClientModify = 'True' ";
-						$sql .= "WHERE Number = " . $number . ";";
-					} // End foreach $player
-				}// End foreach $arrSort
-				//Update the database and save the lines.
-				$db->exec("pragma journal_mode=memory;");
-				$db->exec($sql);
-				$confirmbannertext = "Roster has been saved."; 
-			}else{
-				$confirmbannertext = "No changes have been made to your roster."; 
-			}
-			
-			$confirmbanner = "<div class=\"confirm\">". $confirmbannertext ."</div>";  
-		} // End if isset($_POST["sbtRoster"])
-		
-		// Get the team selection form from the html API if needed
-		if($showDropdown){
-			api_html_form_teamid($db);
-		} // End if there is a showDropdown flag
-
-		// If there is a team ID to use
-		if($teamid > 0){?>
-			<div id="<?= $id ?>">
-				<?php 
-				echo $confirmbanner;
-				$status = array();
-				// Use the player_base SQL API to get the base information
-				// loop for players and goalies
-				// Add add your own order and query
+				$confirmbanner = "";
 				$sql = "";
-				foreach(array("Player","Goaler") AS $type){
-					$sql .= api_sql_players_base($type);
-					$sql .= "WHERE Team = ". $teamid ." ";
-					$sql .= "UNION ";
-				}// End foreach array(Player,Goalie)
-
-				$sql = rtrim($sql,"UNION ") . " ";
-				$sql .= "ORDER BY Name ASC, Overall DESC";
-				$oRS = $db->query($sql);
-
-				// Loop through queries result and add values to new array to display players and goalies
-				while($row = $oRS->fetchArray()){
-					// Loop s for each status on each player
-					for($s=1;$s<=1;$s++){
-						$status[$s][$row["Status".$s]][$row["Number"]]["Number"] = $row["Number"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["Name"] = $row["Name"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["Injury"] = $row["Injury"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["PositionString"] = $row["PositionString"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["PositionNumber"] = $row["PositionNumber"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["Status1"] = $row["Status".$s];
-						$status[$s][$row["Status".$s]][$row["Number"]]["Overall"] = $row["Overall"];
-						$status[$s][$row["Status".$s]][$row["Number"]]["ForceWaiver"] = $row["ForceWaiver"];
-					} // End for loop for statuses
-				} // End while loop for players in result.
-				
-				// Create a next 10 games array to see the games both Pro and Farm will play.
-				// Make the SQL for these 10 games.
-				$nextgames = array();
-				foreach(array("Pro","Farm") AS $league){
-					$count = 0;
-					$sql = "SELECT GameNumber, Day, VisitorTeamName, HomeTeamName, VisitorTeam, ";
-					$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN 'AT' ELSE 'VS' END AS AtVs, ";
-					$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN HomeTeamName ELSE VisitorTeamName END AS Opponent ";
-					$sql .= "FROM Schedule" . $league . " ";
-					$sql .= "WHERE VisitorTeam = ". $teamid ." AND Play = 'False' ";
-					$sql .= "OR HomeTeam = ". $teamid ." AND Play = 'False' ";
-					$sql .= "LIMIT 10 ";
-					$RS = $db->query($sql);
-					
-					// Loop through next 10 games result to make an array of next games for both pro and farm
-					while($row = $RS->fetchArray()){
-						$nextgames[++$count][$league]["GameNumber"] = $row["GameNumber"];
-						$nextgames[$count][$league]["Day"] = $row["Day"];
-						$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
-						$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
-					} // End while for the schedule
-				} // End foreach array(Pro,Farm)
-
-				//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
-				if(empty($nextgames)){
-					foreach(array("Pro","Farm") AS $league){
-						$nextgames[1][$league]["GameNumber"] = "";
-						$nextgames[1][$league]["Day"] = "";
-						$nextgames[1][$league]["Opponent"] = "";
-						$nextgames[1][$league]["AtVs"] = "";
+				$execute = false;
+				// If the Save Lines button has been clicked.
+				if(isset($_POST["sbtRoster"])){
+					// Create an array to organize the information
+					// $arrSort[$table][$playerid][$status]
+					// 		$table = Player or Goalie
+					// 		$playerid = Player Number from PlayerInfo Table
+					// 		$status = selected status for that game. 
+					$arrSort = array();
+					// Loop through the txtRoster array. txtRoster[$nextgame][] = Divider = LINE|LineType, Player = FirstName LastName| Number | PositionNumber | PositionString
+					// Explode at the pipe | 
+					// If the count of the explode is 2 then its a different line
+					// Section.  Switch the value of what the status should be
+					// $_POST["txtRoster"][$game][$status]
+					// $game = int 1-10
+					// $status = int 0-3
+					foreach($_POST["txtRoster"] AS $statuses=>$status){
+						foreach($status AS $s){
+							$explodeValue = explode("|",$s);
+							if(count($explodeValue) == 2){
+								if($explodeValue[1] == "ProDress")$playerStatus = 3;
+								elseif($explodeValue[1] == "ProScratch") $playerStatus = 2;
+								elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
+								else $playerStatus = 0;
+							}else{
+								if($explodeValue[4] != $playerStatus){
+									// Check to see if the updated player status = what is already in the DB. 
+									// If there is a change, add to the arrSort array.
+									$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
+									$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
+								}	
+							}// End if count($explodeValue)
+						} // End foreach $status
+					} // End foreach $_POST["txtRoster"]
+					//pre_r($_POST);
+					// If there is something in the arrSort variable, then:
+					// Loop through the arrSort variable to make 1 individual line of SQL
+					// Per player to update the Status values in the DB.
+					if(count($arrSort) > 0){
+						foreach($arrSort AS $table=>$player){
+							foreach($player AS $number=>$statuses){
+								$sql .= "UPDATE " . $table . "Info ";
+								$sql .= "SET ";
+								foreach($statuses AS $status=>$s){
+									$sql .= $status . " = " . $s . ", ";
+								}
+								$sql .= "WebClientModify = 'True' ";
+								$sql .= "WHERE Number = " . $number . ";";
+							} // End foreach $player
+						}// End foreach $arrSort
+						//Update the database and save the lines.
+						$db->exec("pragma journal_mode=memory;");
+						$db->exec($sql);
+						$confirmbannertext = "Roster has been saved."; 
+					}else{
+						$confirmbannertext = "No changes have been made to your roster."; 
 					}
-				}
-
-				// start the form to submit the roster.
-				?>
+					
+					$confirmbanner = "<div class=\"confirm\">". $confirmbannertext ."</div>";  
+				} // End if isset($_POST["sbtRoster"])
 				
-				<form name="frmRosterEditor" method="POST" id="frmRoster">
-					<?php 
-						foreach(api_dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
-							if(!is_numeric($k)){
-								?><input type="hidden" id="<?= $k ?>" value="<?=strtolower($f); ?>"><?php 
-								echo "\n";
+				// Get the team selection form from the html API if needed
+				if($showDropdown){
+					api_html_form_teamid($db);
+				} // End if there is a showDropdown flag
+
+				// If there is a team ID to use
+				if($teamid > 0){?>
+					
+						<?php 
+						echo $confirmbanner;
+						$status = array();
+						// Use the player_base SQL API to get the base information
+						// loop for players and goalies
+						// Add add your own order and query
+						$sql = "";
+						foreach(array("Player","Goaler") AS $type){
+							$sql .= api_sql_players_base($type);
+							$sql .= "WHERE Team = ". $teamid ." ";
+							$sql .= "UNION ";
+						}// End foreach array(Player,Goalie)
+
+						$sql = rtrim($sql,"UNION ") . " ";
+						$sql .= "ORDER BY Name ASC, Overall DESC";
+						$oRS = $db->query($sql);
+
+						// Loop through queries result and add values to new array to display players and goalies
+						while($row = $oRS->fetchArray()){
+							// Loop s for each status on each player
+							for($s=1;$s<=1;$s++){
+								$status[$s][$row["Status".$s]][$row["Number"]]["Number"] = $row["Number"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Name"] = $row["Name"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Injury"] = $row["Injury"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["PositionString"] = $row["PositionString"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["PositionNumber"] = $row["PositionNumber"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Status1"] = $row["Status".$s];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Overall"] = $row["Overall"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["ForceWaiver"] = $row["ForceWaiver"];
+							} // End for loop for statuses
+						} // End while loop for players in result.
+						
+						// Create a next 10 games array to see the games both Pro and Farm will play.
+						// Make the SQL for these 10 games.
+						$nextgames = array();
+						foreach(array("Pro","Farm") AS $league){
+							$count = 0;
+							$sql = "SELECT GameNumber, Day, VisitorTeamName, HomeTeamName, VisitorTeam, ";
+							$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN 'AT' ELSE 'VS' END AS AtVs, ";
+							$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN HomeTeamName ELSE VisitorTeamName END AS Opponent ";
+							$sql .= "FROM Schedule" . $league . " ";
+							$sql .= "WHERE VisitorTeam = ". $teamid ." AND Play = 'False' ";
+							$sql .= "OR HomeTeam = ". $teamid ." AND Play = 'False' ";
+							$sql .= "LIMIT 10 ";
+							$RS = $db->query($sql);
+							
+							// Loop through next 10 games result to make an array of next games for both pro and farm
+							while($row = $RS->fetchArray()){
+								$nextgames[++$count][$league]["GameNumber"] = $row["GameNumber"];
+								$nextgames[$count][$league]["Day"] = $row["Day"];
+								$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
+								$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
+							} // End while for the schedule
+						} // End foreach array(Pro,Farm)
+
+						//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
+						if(empty($nextgames)){
+							foreach(array("Pro","Farm") AS $league){
+								$nextgames[1][$league]["GameNumber"] = "";
+								$nextgames[1][$league]["Day"] = "";
+								$nextgames[1][$league]["Opponent"] = "";
+								$nextgames[1][$league]["AtVs"] = "";
 							}
 						}
-					?>
 
-					<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
-					<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
-					<?php  
-					// This accordion id is a JQuery accordion. If this ID changes then the JQuery has to be changed as well.
-					?>
-					<div id="accordionfuture">
-						<?php 
-						// Loop through the next games variable to get the lines for the next 10 games.
-						foreach($nextgames AS $nextgame=>$games){?>
-							<?php  //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-							<?php  $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-							<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
-							<div>
-								<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
-								<?php api_html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
-								<div class="columnwrapper"><?php 
-									for($x=3;$x>=0;$x--){
-										if($x == 3){
-											$type = "Pro Dress";	
-										}elseif($x == 2){
-											$type = "Pro Scratch";
-										}elseif($x == 1){
-											$type = "Farm Dress";
-										}else{
-											$type = "Farm Scratch";
-										}
-										$columnid = str_replace(" ","",$type);
-										$colcount = 0;
-										
-										// the id in the ol will be one of #sortProDress, #sortProScratch, #sortFarmDress, #sortFarmScratch.
-										// These id's are in the JQuery call to make the columns sortable via drag and drop. If the IDs change
-										// the calls will have to change in the JQuery.
-										?>
-										<div class="col4">
-											<ol id="sort<?= str_replace(" ","",$columnid)?>" class="sort<?= str_replace(" ","",$columnid) . $nextgame; ?> connectedSortable ui-sortable">
-												<h4 class="columnheader"><?= $type?></h4>
-												<input class="rosterline<?=$nextgame; ?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="LINE|<?= $columnid; ?>">
-												<?php  	
-													// Checks to see if there are players in the current category.
-													// example, if there is at least 1 player in the ProScratch category, loop through and display
-													if(array_key_exists($x, $status[$nextgame])){
-														foreach($status[$nextgame][$x] AS $sid=>$s){
-															// Checks to see if a player is injured. if so, it will add an injury class
-															// to the <li> which will not allow him to be part of the JQuery drag and drop
-															// therefore unmovable. 
-															$inj = ($s["Injury"] != "") ? " injury": "";
-															
-															// playerrow class is the class JQuery is looking for to allow the drag and drop process
-															// if an <li> field has this, it can potentially be moved up and down the column.
-															?>
-															<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?> "class="playerrow <?= $columnid . $inj; ?>">
-																<div class="rowinfo">
-																	<?php 
-																	// Use a hidden field in the form to get the info to save to the SQLite DB.
-																	// The value of the hidden field is a string separated by pipes (|) to parse
-																	// on submit "fieldName|fieldNumber|positionNumber(1-16)|positionString(C,LW)"
-																	$value = api_fields_input_values($s);
+						// start the form to submit the roster.
+						?>
+						
+						<form name="frmRosterEditor" method="POST" id="frmRoster">
+							<?php 
+								foreach(api_dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
+									if(!is_numeric($k)){
+										?><input type="hidden" id="<?= $k ?>" value="<?=strtolower($f); ?>"><?php 
+										echo "\n";
+									}
+								}
+							?>
+
+							<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
+							<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
+							<?php  
+							// This accordion id is a JQuery accordion. If this ID changes then the JQuery has to be changed as well.
+							?>
+							<div id="accordionfuture">
+								<?php 
+								// Loop through the next games variable to get the lines for the next 10 games.
+								foreach($nextgames AS $nextgame=>$games){?>
+									<?php  //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+									<?php  $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
+									<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
+									<div>
+										<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
+										<?php api_html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
+										<div class="columnwrapper"><?php 
+											for($x=3;$x>=0;$x--){
+												if($x == 3){
+													$type = "Pro Dress";	
+												}elseif($x == 2){
+													$type = "Pro Scratch";
+												}elseif($x == 1){
+													$type = "Farm Dress";
+												}else{
+													$type = "Farm Scratch";
+												}
+												$columnid = str_replace(" ","",$type);
+												$colcount = 0;
+												
+												// the id in the ol will be one of #sortProDress, #sortProScratch, #sortFarmDress, #sortFarmScratch.
+												// These id's are in the JQuery call to make the columns sortable via drag and drop. If the IDs change
+												// the calls will have to change in the JQuery.
+												?>
+												<div class="col4">
+													<ol id="sort<?= str_replace(" ","",$columnid)?>" class="sort<?= str_replace(" ","",$columnid) . $nextgame; ?> connectedSortable ui-sortable">
+														<h4 class="columnheader"><?= $type?></h4>
+														<input class="rosterline<?=$nextgame; ?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="LINE|<?= $columnid; ?>">
+														<?php  	
+															// Checks to see if there are players in the current category.
+															// example, if there is at least 1 player in the ProScratch category, loop through and display
+															if(array_key_exists($x, $status[$nextgame])){
+																foreach($status[$nextgame][$x] AS $sid=>$s){
+																	// Checks to see if a player is injured. if so, it will add an injury class
+																	// to the <li> which will not allow him to be part of the JQuery drag and drop
+																	// therefore unmovable. 
+																	$inj = ($s["Injury"] != "") ? " injury": "";
+																	
+																	// playerrow class is the class JQuery is looking for to allow the drag and drop process
+																	// if an <li> field has this, it can potentially be moved up and down the column.
 																	?>
-																	<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
-																	<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
-																</div>
-															</li>
-														<?php }
-													}?>
-											</ol>
-										</div>
-										<?php 
-
-									}?>
-								</div><!-- End .columnwrapper-->
-							</div><!-- End classless/id-less div for the accordion--><?php 
-						break;
-						} // End foreach $nextgames?>
-					</div><!-- End #accordion-->
-				</form> <!-- End frmRostereditor -->
-			</div><!-- End #rostereditor->$id --><?php 
-		}// End if there is a teamid as a parameter
+																	<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?> "class="playerrow <?= $columnid . $inj; ?>">
+																		<div class="rowinfo">
+																			<?php 
+																			// Use a hidden field in the form to get the info to save to the SQLite DB.
+																			// The value of the hidden field is a string separated by pipes (|) to parse
+																			// on submit "fieldName|fieldNumber|positionNumber(1-16)|positionString(C,LW)"
+																			$value = api_fields_input_values($s);
+																			?>
+																			<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
+																			<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
+																		</div>
+																	</li>
+																<?php }
+															}?>
+													</ol>
+												</div><?php
+											}?>
+										</div><!-- End .columnwrapper-->
+									</div><!-- End classless/id-less div for the accordion--><?php 
+								break;
+								} // End foreach $nextgames?>
+							</div><!-- End #accordion-->
+						</form> <!-- End frmRostereditor --><?php 
+				}// End if there is a teamid as a parameter?>
+			</div>
+		</div><!-- End #rostereditor->$id --><?php
 	}
 	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 		// $db = sqlite DB
@@ -592,225 +593,227 @@ function load_api_pageinfo(){
 		}// end isset $_POST[sbtUpdateLines]
 
 		// Get the team selection form from the html API if needed ?>
-		<div id="<?= $id ?>"><?php 
-			if($showDropdown){
-				api_html_form_teamid($db,true);
-			} // End if there is a showDropdown flag
+		<div id="<?= $id ?>">
+			<div class="pagewrapper pagewrapper<?= $id ?>"><?php 
+				if($showDropdown){
+					api_html_form_teamid($db,true);
+				} // End if there is a showDropdown flag
 
-			// If there is a team selected
-			if($teamid > 0 && $league){
-				// Error block for updating feedback to the user.
-				?><div id="errors"></div><?php 
-				if($league == "Pro"){
-					// Set Pro variables
-					$status1 = 3;
-					$isPro = true;
-				}else{
-					// Set Farm variables
-					$status1 = 1;
-					$isPro = false;
-				}
-				// get the fields needed for the ChangePlayer function onClick
-				$dbfields = api_dbresult_line_editor_fields($db);
-				$cpfields = "";
-				foreach($dbfields AS $f){$cpfields .= strtolower($f) .",";}
-				$cpfields = rtrim($cpfields,",");
-				
-				// Get all the players and goalies of the team who are dressed
-				$sql = api_sql_players_base("Player",$isPro);
-				$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
-				$sql .= "UNION ";
-				$sql .= api_sql_players_base("Goaler",$isPro);
-				$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
-				$sql .= "ORDER BY Name ASC, Overall DESC ";
-				?>
-				
-				<div class="playerlist">
-					<?php api_html_checkboxes_positionlist("sltPlayerList","true","inline"); ?>
-					<form name="frmPlayerList">
-						<ul class="playerselect">
-						<?php 	// Loop through the players and add to the select list.
-						$oRS = $db->query($sql);
-						$first = true;
-						while($row = $oRS->fetchArray()){
-							//if its the first item in the loop, select the item as default.
-							if($first){$s = " checked";$first = false;}else{$s = "";}
-							// Separate Name and number with a pipe '|' to split in the javascript.
-							$values = api_fields_input_values($row);
-							?>
-							<li id="line1_<?= api_MakeCSSClass($row["Name"])?>" class="option">
-								<input name="sltPlayerList" type="radio" id="a<?= api_MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
-								<label for="a<?= api_MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</span></label>
-							</li><?php 
-						}?>
-						<li class="option">
-							<input name="sltPlayerList" type="radio" id="aRemove" value="">
-							<label for="aRemove">Remove Player/Goalie</label>
-						</li>
-						</ul>
-					</form><!-- end frmPlayerList-->
-				</div><!-- end playerlist-->
-				<?php 
-				// Select all the lines and players in them for the next game.
-				$sql = "SELECT l.* FROM Team". $league ."Lines AS l LEFT JOIN Team". $league ."Info AS t ON t.Number = l.TeamNumber ";
-				$sql .= "WHERE t.Number = '" . $teamid . "' AND Day = 1 ";
-				$oRS = $db->query($sql);
-				$row = $oRS->fetchArray();
+				// If there is a team selected
+				if($teamid > 0 && $league){
+					// Error block for updating feedback to the user.
+					?><div id="errors"></div><?php 
+					if($league == "Pro"){
+						// Set Pro variables
+						$status1 = 3;
+						$isPro = true;
+					}else{
+						// Set Farm variables
+						$status1 = 1;
+						$isPro = false;
+					}
+					// get the fields needed for the ChangePlayer function onClick
+					$dbfields = api_dbresult_line_editor_fields($db);
+					$cpfields = "";
+					foreach($dbfields AS $f){$cpfields .= strtolower($f) .",";}
+					$cpfields = rtrim($cpfields,",");
+					
+					// Get all the players and goalies of the team who are dressed
+					$sql = api_sql_players_base("Player",$isPro);
+					$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
+					$sql .= "UNION ";
+					$sql .= api_sql_players_base("Goaler",$isPro);
+					$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
+					$sql .= "ORDER BY Name ASC, Overall DESC ";
+					?>
+					
+					<div class="playerlist">
+						<?php api_html_checkboxes_positionlist("sltPlayerList","true","inline"); ?>
+						<form name="frmPlayerList">
+							<ul class="playerselect">
+							<?php 	// Loop through the players and add to the select list.
+							$oRS = $db->query($sql);
+							$first = true;
+							while($row = $oRS->fetchArray()){
+								//if its the first item in the loop, select the item as default.
+								if($first){$s = " checked";$first = false;}else{$s = "";}
+								// Separate Name and number with a pipe '|' to split in the javascript.
+								$values = api_fields_input_values($row);
+								?>
+								<li id="line1_<?= api_MakeCSSClass($row["Name"])?>" class="option">
+									<input name="sltPlayerList" type="radio" id="a<?= api_MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
+									<label for="a<?= api_MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</span></label>
+								</li><?php 
+							}?>
+							<li class="option">
+								<input name="sltPlayerList" type="radio" id="aRemove" value="">
+								<label for="aRemove">Remove Player/Goalie</label>
+							</li>
+							</ul>
+						</form><!-- end frmPlayerList-->
+					</div><!-- end playerlist-->
+					<?php 
+					// Select all the lines and players in them for the next game.
+					$sql = "SELECT l.* FROM Team". $league ."Lines AS l LEFT JOIN Team". $league ."Info AS t ON t.Number = l.TeamNumber ";
+					$sql .= "WHERE t.Number = '" . $teamid . "' AND Day = 1 ";
+					$oRS = $db->query($sql);
+					$row = $oRS->fetchArray();
 
-				// Fill in arrays needed. 
-				//		tabs = line pages, 
-				//		blocks =  section per page, 
-				//		positions = different position combination for the blocks, 
-				//		strategy = strategy slider info.  
+					// Fill in arrays needed. 
+					//		tabs = line pages, 
+					//		blocks =  section per page, 
+					//		positions = different position combination for the blocks, 
+					//		strategy = strategy slider info.  
 
-				$tabs = api_get_line_arrays("tabs");
-				$blocks = api_get_line_arrays("blocks");
-				$positions = api_get_line_arrays("positions");
-				$strategy = api_get_line_arrays("strategy");
-				$count = 0;
-				?>
-				
-				<?php  // Start the tabs for pages of lines.?>
-				<div class="linetabs">
-					<div id="tabs">
-						<ul class="positiontabs">
-							<?php  // loop through the tab names creating clickable tabs. ?>
-							<?php  
-							foreach($tabs AS $i=>$t){
-								$displaytab = false;
-								if($i != "OT"){$displaytab = true;
-								}elseif($i == "OT" && $customOTlines){$displaytab = true;
-								}else{$displaytab = false;
-								}
-								if($displaytab){?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php }
-							}?>	
-						</ul>
-						<?php $count = 0;?>
-						<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
-							// Loop through the tabs info making the lines pages.
-							foreach($tabs AS $i=>$t){
-								$displaytab = false;
-								if($i != "OT"){$displaytab = true;
-								}elseif($i == "OT" && $customOTlines){$displaytab = true;
-								}else{$displaytab = false;
-								}
-								if($displaytab){
-									?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?php 
-										if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
-											// Each of the if'ed statements above have the same kind of info. 
-											// display the blocks based on which tabbed page you are on.
-											api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
-										}elseif($i == "Others"){?>
-											<?php // Start with the goalies. ?>
-											<div class="linesection <?= api_MakeCSSClass($i)?> goalies">
-												<?php 
-													foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third String") AS $gid=>$g){?>
-														<h4><?= $g?></h4>
-														<div class="blockcontainer">
-															<?php  $row["Goaler" . $gid] = (isset($availableplayers[api_MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
-															<div class="positionline"><?= "<input class=\"textname\" id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
-														</div><?php 
-													}
-												?>
-											</div><!-- end linesection <?= api_MakeCSSClass($i)?> goalies-->
-											<?php 
-											// Get the other page fields needed for the blocks.
-											$field = api_get_line_arrays("otherfield");
-
-											// Make the extra forwards and extra defense.
-											foreach($field["start"] AS $fsid=>$fs){?>
-												<div class="linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>">
-													<h4>Extra <?= $fs?></h4>
-													<div class="blockcontainer">
-														<?php foreach($field["end"] AS $feid=>$fe){
-															$usefield = "Extra" .$fsid . $fe;
-															if(array_key_exists($usefield, $row)){?>
-																<div class="positionline">
-																	<div class="positionlabel"><?= $fe?></div>
-																	<div class="positionname">
-																		<?php  $row[$usefield] = (isset($availableplayers[api_MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
-																		<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
-																	</div>
-																</div><?php 
-															}
-														}?>
-													</div><!--end blockcontainer -->
-												</div><!-- end linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>--><?php 
-											}?>
-											<?php // Make the penalty shots order?>
-											<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
-												<h4>Penalty Shots</h4>
-												<div class="blockcontainer">								
-													<div class="penaltyshot">
-														<?php  for($x=1;$x<6;$x++){?>
-														<div class="positionline">
-															<div class="positionlabel"><?= $x ?>.</div>
-															<div class="positionname">
-																<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[api_MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
-																<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
-															</div>	
-														</div>
-														<?php }?>
-													</div>
-												</div><!-- end blockcontainer-->
-											</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots-->
-											<?php
-										}else if($i == "OT"){ 
-											foreach(array(10=>"Forward",5=>"Defense") AS $i=>$p){
-											?><div class="linesection ot ot<?= $p?>">
-												<h4><?= $p?></h4>
-												<div class="blockcontainer">
-													<?php
-													for($x=1;$x<=$i;$x++){
-														?>
-														<div class="positionline">
-															<div class="positionlabel"><?= $x?>.</div>
-															<div class="positionname">
-																<input class="textname" id="OT<?= $p.$x;?>" onclick="ChangePlayer('OT<?= $p.$x;?>','<?= $league ?>',<?=$cpfields?>);"  readonly type="text" name="txtLine[OT<?=$p.$x;?>]" value="<?= $row["OT". $p.$x]; ?>">
-															</div>
-														</div><?php
-													}
+					$tabs = api_get_line_arrays("tabs");
+					$blocks = api_get_line_arrays("blocks");
+					$positions = api_get_line_arrays("positions");
+					$strategy = api_get_line_arrays("strategy");
+					$count = 0;
+					?>
+					
+					<?php  // Start the tabs for pages of lines.?>
+					<div class="linetabs">
+						<div id="tabs">
+							<ul class="positiontabs">
+								<?php  // loop through the tab names creating clickable tabs. ?>
+								<?php  
+								foreach($tabs AS $i=>$t){
+									$displaytab = false;
+									if($i != "OT"){$displaytab = true;
+									}elseif($i == "OT" && $customOTlines){$displaytab = true;
+									}else{$displaytab = false;
+									}
+									if($displaytab){?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php }
+								}?>	
+							</ul>
+							<?php $count = 0;?>
+							<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
+								// Loop through the tabs info making the lines pages.
+								foreach($tabs AS $i=>$t){
+									$displaytab = false;
+									if($i != "OT"){$displaytab = true;
+									}elseif($i == "OT" && $customOTlines){$displaytab = true;
+									}else{$displaytab = false;
+									}
+									if($displaytab){
+										?><div id="tabs-<?= ++$count ?>" class="tabcontainer"><?php 
+											if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
+												// Each of the if'ed statements above have the same kind of info. 
+												// display the blocks based on which tabbed page you are on.
+												api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
+											}elseif($i == "Others"){?>
+												<?php // Start with the goalies. ?>
+												<div class="linesection <?= api_MakeCSSClass($i)?> goalies">
+													<?php 
+														foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third String") AS $gid=>$g){?>
+															<h4><?= $g?></h4>
+															<div class="blockcontainer">
+																<?php  $row["Goaler" . $gid] = (isset($availableplayers[api_MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
+																<div class="positionline"><?= "<input class=\"textname\" id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
+															</div><?php 
+														}
 													?>
-												</div>
-											<?php
+												</div><!-- end linesection <?= api_MakeCSSClass($i)?> goalies-->
+												<?php 
+												// Get the other page fields needed for the blocks.
+												$field = api_get_line_arrays("otherfield");
 
-											?></div><?php	
-											}
-										}else{
-											// Make the Offsensive and Defensive Lines.
-											$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
-											foreach($types AS $tid=>$t){?>
-												<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
-													<h4><?= $t?></h4>
-													<div class="blockcontainer"><?php 
-														$fordef = array("Forward", "Defense");
-														foreach($fordef AS $fd){
-															foreach($positions[$fd] AS $pid=>$pos){
-																$usefield = "LastMin" . $tid . $fd . $pid;
-																if(array_key_exists($usefield, $row)){
-																	?>
+												// Make the extra forwards and extra defense.
+												foreach($field["start"] AS $fsid=>$fs){?>
+													<div class="linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>">
+														<h4>Extra <?= $fs?></h4>
+														<div class="blockcontainer">
+															<?php foreach($field["end"] AS $feid=>$fe){
+																$usefield = "Extra" .$fsid . $fe;
+																if(array_key_exists($usefield, $row)){?>
 																	<div class="positionline">
-																		<div class="positionlabel"><?= $pos?></div>
+																		<div class="positionlabel"><?= $fe?></div>
 																		<div class="positionname">
-																			<?= "<input id=\"". $usefield ."\" onclick=\"ChangePlayer('". $usefield ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $usefield ."]\" value=\"". $row[$usefield] ."\">";?>
+																			<?php  $row[$usefield] = (isset($availableplayers[api_MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
+																			<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
 																		</div>
 																	</div><?php 
 																}
-															}
-														}?>
+															}?>
+														</div><!--end blockcontainer -->
+													</div><!-- end linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>--><?php 
+												}?>
+												<?php // Make the penalty shots order?>
+												<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
+													<h4>Penalty Shots</h4>
+													<div class="blockcontainer">								
+														<div class="penaltyshot">
+															<?php  for($x=1;$x<6;$x++){?>
+															<div class="positionline">
+																<div class="positionlabel"><?= $x ?>.</div>
+																<div class="positionname">
+																	<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[api_MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
+																	<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
+																</div>	
+															</div>
+															<?php }?>
+														</div>
 													</div><!-- end blockcontainer-->
-												</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots--><?php 
+												</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots-->
+												<?php
+											}else if($i == "OT"){ 
+												foreach(array(10=>"Forward",5=>"Defense") AS $i=>$p){
+												?><div class="linesection ot ot<?= $p?>">
+													<h4><?= $p?></h4>
+													<div class="blockcontainer">
+														<?php
+														for($x=1;$x<=$i;$x++){
+															?>
+															<div class="positionline">
+																<div class="positionlabel"><?= $x?>.</div>
+																<div class="positionname">
+																	<input class="textname" id="OT<?= $p.$x;?>" onclick="ChangePlayer('OT<?= $p.$x;?>','<?= $league ?>',<?=$cpfields?>);"  readonly type="text" name="txtLine[OT<?=$p.$x;?>]" value="<?= $row["OT". $p.$x]; ?>">
+																</div>
+															</div><?php
+														}
+														?>
+													</div>
+												<?php
+
+												?></div><?php	
+												}
+											}else{
+												// Make the Offsensive and Defensive Lines.
+												$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
+												foreach($types AS $tid=>$t){?>
+													<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
+														<h4><?= $t?></h4>
+														<div class="blockcontainer"><?php 
+															$fordef = array("Forward", "Defense");
+															foreach($fordef AS $fd){
+																foreach($positions[$fd] AS $pid=>$pos){
+																	$usefield = "LastMin" . $tid . $fd . $pid;
+																	if(array_key_exists($usefield, $row)){
+																		?>
+																		<div class="positionline">
+																			<div class="positionlabel"><?= $pos?></div>
+																			<div class="positionname">
+																				<?= "<input id=\"". $usefield ."\" onclick=\"ChangePlayer('". $usefield ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $usefield ."]\" value=\"". $row[$usefield] ."\">";?>
+																			</div>
+																		</div><?php 
+																	}
+																}
+															}?>
+														</div><!-- end blockcontainer-->
+													</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots--><?php 
+												}
 											}
-										}
-									?></div><!-- end tabs-<?= $count ?>--><?php 
-								}
-							}?>
-							<input id="linesubmit" type="submit" value="Update Lines" name="sbtUpdateLines">
-						</form>
-					</div><!-- end tabs-->
-				</div><!-- end linetabs--><?php 
-			}// end if a team is selected?>
-		</div><?php 
+										?></div><!-- end tabs-<?= $count ?>--><?php 
+									}
+								}?>
+								<input id="linesubmit" type="submit" value="Update Lines" name="sbtUpdateLines">
+							</form>
+						</div><!-- end tabs-->
+					</div><!-- end linetabs--><?php 
+				}// end if a team is selected?>
+			</div><!-- end pagewrapper-->
+		</div><!-- End $id div--><?php 
 	}
 	function api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league){
 		$bcount = 0;
