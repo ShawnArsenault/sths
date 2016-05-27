@@ -1,5 +1,5 @@
 <?php
-function load_apis($exempt){
+function load_apis($exempt=array()){
 	if(!in_array("api", $exempt)){load_api();}
 	if(!in_array("dbresults", $exempt)){load_api_dbresults();}
 	if(!in_array("fields", $exempt)){load_api_fields();}
@@ -12,13 +12,13 @@ function load_apis($exempt){
 }
 
 function load_api(){
-	function sqlite_connect($filename="STHS.db"){
+	function api_sqlite_connect($filename="STHS.db"){
 		$db = new SQLite3($filename);
 		return $db;
 	}
 	// Helper function to take strings and turn them
 	// into CSS Classes or IDs removing spaces and symbols.
-	function MakeCSSClass($var){
+	function api_MakeCSSClass($var){
 		$ret = preg_replace("/[^a-zA-Z0-9\s]/", "", $var);
 		$ret = str_replace(" ", "" , $ret);
 		$ret = strtolower($ret);
@@ -27,12 +27,12 @@ function load_api(){
 }
 
 function load_api_dbresults(){
-	function dbresult_roster_editor_fields($db,$teamid){
-		$rs = $db->query(sql_roster_editor_fields($teamid));
+	function api_dbresult_roster_editor_fields($db,$teamid){
+		$rs = $db->query(api_sql_roster_editor_fields($teamid));
 		return $rs->fetchArray();
 	}
-	function dbresult_line_editor_fields($db){
-		$rs = $db->query(sql_line_editor_fields());
+	function api_dbresult_line_editor_fields($db){
+		$rs = $db->query(api_sql_line_editor_fields());
 		$row = $rs->fetchArray();
 		foreach($row AS $id=>$r){
 			if(is_numeric($id)){unset($row[$id]);}
@@ -43,18 +43,18 @@ function load_api_dbresults(){
 
 function load_api_fields(){
 	// Return all the fields needed for the roster editor.
-	function fields_roster_editor_setup(){
+	function api_fields_roster_editor_setup(){
 		return  array(	"MaximumPlayerPerTeam","MinimumPlayerPerTeam","isWaivers","BlockSenttoFarmAfterTradeDeadline","isAfterTradeDeadline","ProTeamEliminatedCannotSendPlayerstoFarm","isEliminated","ForceCorrect10LinesupbeforeSaving",
 						"ProMinC","ProMinLW","ProMinRW","ProMinD","ProMinForward","ProGoalerInGame","ProPlayerInGame","ProPlayerLimit", 
 						"FarmMinC","FarmMinLW","FarmMinRW","FarmMinD","FarmMinForward","FarmGoalerInGame","FarmPlayerInGame","FarmPlayerLimit","MaxFarmOv","MaxFarmOvGoaler","GamesLeft");
 	}
 	// Return all the fields needed for the line editor.
-	function fields_line_editor_setup(){
+	function api_fields_line_editor_setup(){
 		return  array(	"BlockPlayerFromPlayingLines12","BlockPlayerFromPlayingLines123","BlockPlayerFromPlayingLines12inPPPK",
 						"ProForceGameStrategiesTo","ProForceGameStrategiesAt5","FarmForceGameStrategiesTo","FarmForceGameStrategiesAt5",
 						"PullGoalerMinGoal","PullGoalerMinPct","PullGoalerRemoveGoaliesSecond");
 	}
-	function fields_input_values($row){
+	function api_fields_input_values($row){
 		$value = $row["Name"] ."|";
 		$value .= $row["Number"] ."|";
 		$value .= $row["PositionNumber"]."|";
@@ -62,7 +62,7 @@ function load_api_fields(){
 		$value .= $row["Status1"] . "|";
 		$value .= $row["Overall"] . "|";
 		$value .= strtolower($row["ForceWaiver"]) . "|";
-		$value .= MakeCSSClass($row["Name"]);
+		$value .= api_MakeCSSClass($row["Name"]);
 
 		return $value;
 	}
@@ -70,7 +70,7 @@ function load_api_fields(){
 
 function load_api_html(){
 	// Create a dropdown with all teams
-	function html_form_teamid($db,$farm=false){
+	function api_html_form_teamid($db,$farm=false){
 		$teamid = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : "";
 		$proLeague = (isset($_REQUEST["League"]) && $_REQUEST["League"] == "Farm") ? false : true;
 		?>
@@ -97,7 +97,7 @@ function load_api_html(){
 		</form>
 		<?php
 	}
-	function html_checkboxes_positionlist($elementName,$byName="true",$display="inline"){
+	function api_html_checkboxes_positionlist($elementName,$byName="true",$display="inline"){
 		?>
 		<div class="positionlist">
 			<label><input onchange="update_position_list('<?= $elementName; ?>',<?= $byName; ?>,'<?= $display; ?>');" type="checkbox" id="posC" name="position" class="position" checked>C</label>
@@ -111,7 +111,7 @@ function load_api_html(){
 }
 
 function load_api_jquery(){
-	function jquery_call_jquery(){
+	function api_jquery_call_jquery(){
 		?>
 		<script src="http://code.jquery.com/jquery-1.9.1.js"></script> <!-- Load in JQuery -->
 		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script><!-- Load in JQuery UI -->
@@ -119,7 +119,7 @@ function load_api_jquery(){
 		<script src="js/jquery.labs.js"></script><!-- Load in JQuery from Labs -->
 		<?php
 	}
-	function jquery_roster_editor_draggable($jsfunction){?>
+	function api_jquery_roster_editor_draggable($jsfunction){?>
 		<script>
 		$(function() {
 		    $("#sortProDress, #sortProScratch, #sortFarmDress, #sortFarmScratch").sortable({
@@ -138,16 +138,16 @@ function load_api_jquery(){
 }
 
 function load_api_js(){
-	function js_function_roster_validator($db,$teamid){
-		$jsRow = dbresult_roster_editor_fields($db,$teamid);
+	function api_js_function_roster_validator($db,$teamid){
+		$jsRow = api_dbresult_roster_editor_fields($db,$teamid);
 		$f = "";
 		foreach(array_keys($jsRow) AS $k){
 			if(!is_numeric($k))$f .= (!is_numeric($jsRow[$k])) ? strtolower($jsRow[$k]) . "," : $jsRow[$k] .",";
 		}
 		return "roster_validator(". rtrim($f,",") .");";
 	}
-	function js_function_line_validator($db){
-		$jsRow = dbresult_line_editor_fields($db);
+	function api_js_function_line_validator($db){
+		$jsRow = api_dbresult_line_editor_fields($db);
 		$f = "";
 		foreach(array_keys($jsRow) AS $k){
 			if(!is_numeric($k))$f .= (!is_numeric($jsRow[$k])) ? strtolower($jsRow[$k]) . "," : $jsRow[$k] .",";
@@ -157,7 +157,7 @@ function load_api_js(){
 }
 
 function load_api_layout(){
-	function layout_header($id=false,$db=false,$headcode=""){?>
+	function api_layout_header($id=false,$db=false,$headcode=""){?>
 		<!DOCTYPE html>
 			<html>
 			<head>
@@ -196,42 +196,43 @@ function load_api_layout(){
 					// If we are on the roster editor page, the body tage needs an onload function to validate the rosters at default.
 					// If so and a team is selected, create the onload attribute with the js_function_roster_validator to placein the body tag. 
 					if($id == "rostereditor" && array_key_exists("TeamID", $_REQUEST)){  
-						jquery_call_jquery();
-						$jsfunction = js_function_roster_validator($db,$_REQUEST["TeamID"]);
+						api_jquery_call_jquery();
+						$jsfunction = api_js_function_roster_validator($db,$_REQUEST["TeamID"]);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						// Add the jquery for draggable columns.
-						jquery_roster_editor_draggable($jsfunction);
+						api_jquery_roster_editor_draggable($jsfunction);
 					}
 				?>
 				<?php
 					if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
-						jquery_call_jquery();
-						$jsfunction = js_function_line_validator($db);
+						api_jquery_call_jquery();
+						$jsfunction = api_js_function_line_validator($db);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						
-						echo script_team_array($db); 
+						echo api_script_team_array($db); 
 					}
-				Echo $headcode;
+				if($headcode != ""){echo $headcode;}
 				?>
+
 			</head>
 		<?php
 		// Start the Body, add an onload function if set above.
 		?><body<?= (isset($onload)) ? $onload : "";?>><?php
 	}
 
-	function layout_footer(){
+	function api_layout_footer(){
 		?></body></html><?php
 	}
 
-	function script_team_array($db){
+	function api_script_team_array($db){
 		$pos = array(0=>"C",1=>"LW",2=>"RW",3=>"D",4=>"G",);
 		$position = array();
 		foreach(array(3=>"Pro",1=>"Farm") AS $status=>$league){
 			$isPro = ($status == 3) ? true: false;
-			$SQL = sql_players_base("Player",$isPro);
+			$SQL = api_sql_players_base("Player",$isPro);
 			$SQL .= "WHERE Team = " . $_REQUEST["TeamID"]  . " AND Status1 = ". $status ." ";
 			$SQL .= "UNION ";
-			$SQL .= sql_players_base("Goaler",$isPro);
+			$SQL .= api_sql_players_base("Goaler",$isPro);
 			$SQL .= "WHERE Team = " . $_REQUEST["TeamID"]  . " AND Status1 = ". $status ." ";
 			$SQL .= "ORDER BY PositionNumber, Name ";
 			
@@ -265,7 +266,7 @@ function load_api_layout(){
 }
 
 function load_api_pageinfo(){
-	function pageinfo_editor_roster($db,$teamid,$showDropdown=true){
+	function api_pageinfo_editor_roster($db,$teamid,$showDropdown=true){
 		// $db = sqlite DB
 		// $teamid is a teamid to use that teams roster.
 		// $showDropdown is a flag if you want to toggle between teams.
@@ -336,7 +337,7 @@ function load_api_pageinfo(){
 		
 		// Get the team selection form from the html API if needed
 		if($showDropdown){
-			html_form_teamid($db);
+			api_html_form_teamid($db);
 		} // End if there is a showDropdown flag
 
 		// If there is a team ID to use
@@ -350,7 +351,7 @@ function load_api_pageinfo(){
 				// Add add your own order and query
 				$sql = "";
 				foreach(array("Player","Goaler") AS $type){
-					$sql .= sql_players_base($type);
+					$sql .= api_sql_players_base($type);
 					$sql .= "WHERE Team = ". $teamid ." ";
 					$sql .= "UNION ";
 				}// End foreach array(Player,Goalie)
@@ -412,7 +413,7 @@ function load_api_pageinfo(){
 				
 				<form name="frmRosterEditor" method="POST" id="frmRoster">
 					<?php 
-						foreach(dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
+						foreach(api_dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
 							if(!is_numeric($k)){
 								?><input type="hidden" id="<?= $k ?>" value="<?=strtolower($f); ?>"><?php 
 								echo "\n";
@@ -434,7 +435,7 @@ function load_api_pageinfo(){
 							<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
 							<div>
 								<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
-								<?php html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
+								<?php api_html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
 								<div class="columnwrapper"><?php 
 									for($x=3;$x>=0;$x--){
 										if($x == 3){
@@ -470,13 +471,13 @@ function load_api_pageinfo(){
 															// playerrow class is the class JQuery is looking for to allow the drag and drop process
 															// if an <li> field has this, it can potentially be moved up and down the column.
 															?>
-															<li id="line<?=$nextgame . "_" . MakeCSSClass($s["Name"])?>" class="playerrow <?= $columnid . $inj; ?>">
+															<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?> "class="playerrow <?= $columnid . $inj; ?>">
 																<div class="rowinfo">
 																	<?php 
 																	// Use a hidden field in the form to get the info to save to the SQLite DB.
 																	// The value of the hidden field is a string separated by pipes (|) to parse
 																	// on submit "fieldName|fieldNumber|positionNumber(1-16)|positionString(C,LW)"
-																	$value = fields_input_values($s);
+																	$value = api_fields_input_values($s);
 																	?>
 																	<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
 																	<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
@@ -498,7 +499,7 @@ function load_api_pageinfo(){
 			</div><!-- End #rostereditor->$id --><?php 
 		}// End if there is a teamid as a parameter
 	}
-	function pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
+	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
 		// $db = sqlite DB
 		// $teamid is a teamid to use that teams roster.
 		// $league is "Pro" or "Farm" based on selection.
@@ -524,8 +525,8 @@ function load_api_pageinfo(){
 			// show he isn't there and show blank on the line. 
 			$availableplayers = array();
 			while($row = $oRS->fetchArray()){
-				$availableplayers[MakeCSSClass($row["Name"])]["id"] = $row["Number"];
-				$availableplayers[MakeCSSClass($row["Name"])]["Name"] = $row["Name"];
+				$availableplayers[api_MakeCSSClass($row["Name"])]["id"] = $row["Number"];
+				$availableplayers[api_MakeCSSClass($row["Name"])]["Name"] = $row["Name"];
 			}
 
 			// Check to see if Custom OT lines are turned on 
@@ -540,7 +541,7 @@ function load_api_pageinfo(){
 		// If the updatelines submit button is clicked 
 		if(isset($_POST["sbtUpdateLines"])){
 			$fminfo = "";
-			$dbfields = get_fields($db,$customOTlines);
+			$dbfields = api_get_fields($db,$customOTlines);
 			$fmfields = array_merge($_POST["txtLine"],$_POST["txtStrategies"]);
 			$sql = "SELECT " . implode(" || ',' || ", $dbfields) . " AS LineValues FROM Team". $_REQUEST["League"] ."Lines WHERE TeamNumber = " . $_REQUEST["TeamID"] . " AND Day = 1;";
 			$oRS = $db->query($sql);
@@ -564,11 +565,11 @@ function load_api_pageinfo(){
 				foreach($dbfields AS $i=>$f){
 					if($arrDB[$i] != $arrFM[$i]){
 						if(is_numeric($arrFM[$i])){
-							$val    = sqlite_escape($arrFM[$i]);
-							$valno  = sqlite_escape($arrFM[$i]);
+							$val    = api_sqlite_escape($arrFM[$i]);
+							$valno  = api_sqlite_escape($arrFM[$i]);
 						}else{
-							$val    = "'" . sqlite_escape($arrFM[$i]) . "'";
-							$valno  = $availableplayers[MakeCSSClass($arrFM[$i])]["id"];
+							$val    = "'" . api_sqlite_escape($arrFM[$i]) . "'";
+							$valno  = $availableplayers[api_MakeCSSClass($arrFM[$i])]["id"];
 						}
 						$sql   .= $f . " = " . $val . ", ";
 						$sqlno .= $f . " = " . $valno . ", ";
@@ -593,7 +594,7 @@ function load_api_pageinfo(){
 		// Get the team selection form from the html API if needed ?>
 		<div id="<?= $id ?>"><?php 
 			if($showDropdown){
-				html_form_teamid($db,true);
+				api_html_form_teamid($db,true);
 			} // End if there is a showDropdown flag
 
 			// If there is a team selected
@@ -610,22 +611,22 @@ function load_api_pageinfo(){
 					$isPro = false;
 				}
 				// get the fields needed for the ChangePlayer function onClick
-				$dbfields = dbresult_line_editor_fields($db);
+				$dbfields = api_dbresult_line_editor_fields($db);
 				$cpfields = "";
 				foreach($dbfields AS $f){$cpfields .= strtolower($f) .",";}
 				$cpfields = rtrim($cpfields,",");
 				
 				// Get all the players and goalies of the team who are dressed
-				$sql = sql_players_base("Player",$isPro);
+				$sql = api_sql_players_base("Player",$isPro);
 				$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
 				$sql .= "UNION ";
-				$sql .= sql_players_base("Goaler",$isPro);
+				$sql .= api_sql_players_base("Goaler",$isPro);
 				$sql .= "WHERE Team = " . $teamid . " AND Status1 = " . $status1 . " ";
 				$sql .= "ORDER BY Name ASC, Overall DESC ";
 				?>
 				
 				<div class="playerlist">
-					<?php html_checkboxes_positionlist("sltPlayerList","true","inline"); ?>
+					<?php api_html_checkboxes_positionlist("sltPlayerList","true","inline"); ?>
 					<form name="frmPlayerList">
 						<ul class="playerselect">
 						<?php 	// Loop through the players and add to the select list.
@@ -635,11 +636,11 @@ function load_api_pageinfo(){
 							//if its the first item in the loop, select the item as default.
 							if($first){$s = " checked";$first = false;}else{$s = "";}
 							// Separate Name and number with a pipe '|' to split in the javascript.
-							$values = fields_input_values($row);
+							$values = api_fields_input_values($row);
 							?>
-							<li id="line1_<?= MakeCSSClass($row["Name"])?>" class="option">
-								<input name="sltPlayerList" type="radio" id="a<?= MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
-								<label for="a<?= MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</span></label>
+							<li id="line1_<?= api_MakeCSSClass($row["Name"])?>" class="option">
+								<input name="sltPlayerList" type="radio" id="a<?= api_MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
+								<label for="a<?= api_MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</span></label>
 							</li><?php 
 						}?>
 						<li class="option">
@@ -662,10 +663,10 @@ function load_api_pageinfo(){
 				//		positions = different position combination for the blocks, 
 				//		strategy = strategy slider info.  
 
-				$tabs = get_line_arrays("tabs");
-				$blocks = get_line_arrays("blocks");
-				$positions = get_line_arrays("positions");
-				$strategy = get_line_arrays("strategy");
+				$tabs = api_get_line_arrays("tabs");
+				$blocks = api_get_line_arrays("blocks");
+				$positions = api_get_line_arrays("positions");
+				$strategy = api_get_line_arrays("strategy");
 				$count = 0;
 				?>
 				
@@ -698,27 +699,27 @@ function load_api_pageinfo(){
 										if($i == "Forward" || $i == "Defense" || $i == "PP" || $i == "PK4" || $i == "4VS4" || $i == "PK3"){	
 											// Each of the if'ed statements above have the same kind of info. 
 											// display the blocks based on which tabbed page you are on.
-											make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
+											api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
 										}elseif($i == "Others"){?>
 											<?php // Start with the goalies. ?>
-											<div class="linesection <?= MakeCSSClass($i)?> goalies">
+											<div class="linesection <?= api_MakeCSSClass($i)?> goalies">
 												<?php 
 													foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third String") AS $gid=>$g){?>
 														<h4><?= $g?></h4>
 														<div class="blockcontainer">
-															<?php  $row["Goaler" . $gid] = (isset($availableplayers[MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
+															<?php  $row["Goaler" . $gid] = (isset($availableplayers[api_MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
 															<div class="positionline"><?= "<input class=\"textname\" id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
 														</div><?php 
 													}
 												?>
-											</div><!-- end linesection <?= MakeCSSClass($i)?> goalies-->
+											</div><!-- end linesection <?= api_MakeCSSClass($i)?> goalies-->
 											<?php 
 											// Get the other page fields needed for the blocks.
-											$field = get_line_arrays("otherfield");
+											$field = api_get_line_arrays("otherfield");
 
 											// Make the extra forwards and extra defense.
 											foreach($field["start"] AS $fsid=>$fs){?>
-												<div class="linesection <?= MakeCSSClass($i)?> extra <?= $fs?>">
+												<div class="linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>">
 													<h4>Extra <?= $fs?></h4>
 													<div class="blockcontainer">
 														<?php foreach($field["end"] AS $feid=>$fe){
@@ -727,17 +728,17 @@ function load_api_pageinfo(){
 																<div class="positionline">
 																	<div class="positionlabel"><?= $fe?></div>
 																	<div class="positionname">
-																		<?php  $row[$usefield] = (isset($availableplayers[MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
+																		<?php  $row[$usefield] = (isset($availableplayers[api_MakeCSSClass($row[$usefield])])) ? $row[$usefield] : "";?>
 																		<input id="<?= $usefield ?>" onclick="ChangePlayer('<?= $usefield ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[<?= $usefield ?>]" value="<?= $row[$usefield] ?>">
 																	</div>
 																</div><?php 
 															}
 														}?>
 													</div><!--end blockcontainer -->
-												</div><!-- end linesection <?= MakeCSSClass($i)?> extra <?= $fs?>--><?php 
+												</div><!-- end linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>--><?php 
 											}?>
 											<?php // Make the penalty shots order?>
-											<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
+											<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
 												<h4>Penalty Shots</h4>
 												<div class="blockcontainer">								
 													<div class="penaltyshot">
@@ -745,14 +746,14 @@ function load_api_pageinfo(){
 														<div class="positionline">
 															<div class="positionlabel"><?= $x ?>.</div>
 															<div class="positionname">
-																<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
+																<?php  $row["PenaltyShots" . $x] = (isset($availableplayers[api_MakeCSSClass($row["PenaltyShots" . $x])])) ? $row["PenaltyShots" . $x] : "";?>
 																<input id="PenaltyShots<?= $x ?>" onclick="ChangePlayer('PenaltyShots<?= $x ?>','<?= $league ?>',<?=$cpfields?>);" class="textname" readonly type="text" name="txtLine[PenaltyShots<?= $x ?>]" value="<?= $row["PenaltyShots" . $x] ?>">
 															</div>	
 														</div>
 														<?php }?>
 													</div>
 												</div><!-- end blockcontainer-->
-											</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots-->
+											</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots-->
 											<?php
 										}else if($i == "OT"){ 
 											foreach(array(10=>"Forward",5=>"Defense") AS $i=>$p){
@@ -779,7 +780,7 @@ function load_api_pageinfo(){
 											// Make the Offsensive and Defensive Lines.
 											$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
 											foreach($types AS $tid=>$t){?>
-												<div class="linesection <?= MakeCSSClass($i)?> penaltyshots">
+												<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
 													<h4><?= $t?></h4>
 													<div class="blockcontainer"><?php 
 														$fordef = array("Forward", "Defense");
@@ -798,7 +799,7 @@ function load_api_pageinfo(){
 															}
 														}?>
 													</div><!-- end blockcontainer-->
-												</div><!-- end linesection <?= MakeCSSClass($i)?> penaltyshots--><?php 
+												</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots--><?php 
 											}
 										}
 									?></div><!-- end tabs-<?= $count ?>--><?php 
@@ -811,10 +812,10 @@ function load_api_pageinfo(){
 			}// end if a team is selected?>
 		</div><?php 
 	}
-	function make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league){
+	function api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league){
 		$bcount = 0;
 		foreach($blocks[$i] AS $bid=>$block){?>
-			<div class="linesection <?= MakeCSSClass($i)?> <?= MakeCSSClass($bid)?>">
+			<div class="linesection <?= api_MakeCSSClass($i)?> <?= api_MakeCSSClass($bid)?>">
 				<h4><?= $block ?></h4>
 				<div class="blockcontainer">
 					<div class="positionwrapper">
@@ -845,7 +846,7 @@ function load_api_pageinfo(){
 							<div class="positionline">
 								<div class="positionlabel"><?= $pos?></div>
 								<div class="positionname">
-									<?php  $row[$field . $pid] = (isset($availableplayers[MakeCSSClass($row[$field . $pid])])) ? $row[$field . $pid]: "";?>
+									<?php  $row[$field . $pid] = (isset($availableplayers[api_MakeCSSClass($row[$field . $pid])])) ? $row[$field . $pid]: "";?>
 									<?= "<input id=\"". $field . $pid ."\" onclick=\"ChangePlayer('". $field . $pid ."','". $league ."',".$cpfields.");\" class=\"textname\" readonly type=\"text\" name=\"txtLine[". $field . $pid ."]\" value=\"".  $row[$field . $pid] ."\">";?>
 								</div>
 							</div>
@@ -858,7 +859,7 @@ function load_api_pageinfo(){
 									<div class="strats">
 										<div class="stratlabel"><?= $sid?> : </div>
 										<div class="stratvalue">
-											<?php make_strategies($row,$field,$sid,true,$cpfields);?>
+											<?php api_make_strategies($row,$field,$sid,true,$cpfields);?>
 										</div>
 									</div>
 								<?php }?>
@@ -868,16 +869,16 @@ function load_api_pageinfo(){
 							<div class="time">
 								<div class="timelabel">Time % : </div>
 								<div class="timevalue">
-									<?php make_strategies($row,$field,"Time",false,$cpfields);?>
+									<?php api_make_strategies($row,$field,"Time",false,$cpfields);?>
 								</div>
 							</div>
 						</div><!-- end timerwrapper-->
 					</div><!-- end sliders-->
 				</div><!-- end blockcontainer-->
-			</div><!-- end linesection <?= MakeCSSClass($i)?> <?= MakeCSSClass($bid)?>--><?php 
+			</div><!-- end linesection <?= api_MakeCSSClass($i)?> <?= api_MakeCSSClass($bid)?>--><?php 
 		}
 	}
-	function make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
+	function api_make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
 		<?php $use = ($strat) ? "Strat" : "Time";?>
 		<?php $id = $field . $sid; ?>
 		<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="&#160;">
@@ -885,7 +886,7 @@ function load_api_pageinfo(){
 		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="&#160;">
 		<?php 
 	}
-	function get_fields($db,$customOTlines){
+	function api_get_fields($db,$customOTlines){
 		// Make an array of field names in the DB.
 		$sql = "PRAGMA table_info(Team". $_REQUEST["League"] ."Lines);";
 		$oRS = $db->query($sql);
@@ -896,10 +897,10 @@ function load_api_pageinfo(){
 				$fields[$count++] = $row["name"];
 			}
 		}
-		if(!$customOTlines){$fields = array_diff($fields,get_line_arrays("otfields"));}
+		if(!$customOTlines){$fields = array_diff($fields,api_get_line_arrays("otfields"));}
 		return $fields;
 	}
-	function get_line_arrays($type="blocks"){
+	function api_get_line_arrays($type="blocks"){
 		// This returns an array of needed information.
 		$arr["tabs"] = array("Forward"=>"Forward","Defense"=>"Defense","PP"=>"PP","4VS4"=>"4vs4","PK4"=>"PK4","PK3"=>"PK3","Others"=>"Others","LastMin"=>"Last Min","OT"=>"Overtime");
 		$arr["blocks"]["Forward"] = array("line1"=>"Lines #1","line2"=>"Lines #2","line3"=>"Lines #3","line4"=>"Lines #4");
@@ -929,30 +930,30 @@ function load_api_sql(){
 	// SQLite Snippets
 	/********************************************/
 		// Escape the characters in text that could break the PHP
-		function sqlite_escape($text){
+		function api_sqlite_escape($text){
 			$ret = str_replace("'","''",$text);
 			return $ret;
 		}
 		// Returns Goalie Save Percentage
-		function sql_sp($prefix=false){
+		function api_sql_sp($prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			$sp = "ROUND((".$p."SA - ".$p."GA) / CAST(".$p."SA AS REAL),3)";
 			return $sp;
 		}
 		// Returns Goalie Goals Against Average
-		function sql_gaa($prefix=false){
+		function api_sql_gaa($prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			$gaa = "ROUND((". $p ."GA*60) / (". $p ."SecondPlay/60.00),2)";
 			return $gaa;
 		}
 		// Returns a concatenate of position in order of CenterLeftwingRightingDefense, if its goalie 'FalseFalseFalseFalse'
-		function sql_position($type="Player",$prefix=false){
+		function api_sql_position($type="Player",$prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			$pos = ($type == "Goaler") ? "'FalseFalseFalseFalse'" : $p."PosC || ". $p ."PosLW || ". $p ."PosRW || ". $p ."PosD" ;
 			return $pos;
 		}
 		// Returns a number for position sorting 1 = C, 2=C,LW etc. 
-		function sql_position_number($type="Player",$prefix=""){
+		function api_sql_position_number($type="Player",$prefix=""){
 			if($prefix != ""){$p = $prefix . ".";}
 			if($type != "Goaler"){
 				$pc = $p."PosC || ". $p ."PosLW || ". $p ."PosRW || ". $p ."PosD";
@@ -981,7 +982,7 @@ function load_api_sql(){
 			return $pos;
 		}
 		// Returns a CSV of a position string. 
-		function sql_position_string($type="Player",$prefix=""){
+		function api_sql_position_string($type="Player",$prefix=""){
 			if($prefix != ""){$p = $prefix . ".";}
 			if($type != "Goaler"){
 				$pc = $p."PosC || ". $p ."PosLW || ". $p ."PosRW || ". $p ."PosD";
@@ -1010,13 +1011,13 @@ function load_api_sql(){
 			return $pos;
 		}
 		// Returns all regular positions in a concatenated string. Goalies are 'FalseFalseFalseFalse'
-		function sql_position_all($type="Player",$prefix=false){
+		function api_sql_position_all($type="Player",$prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			$pos = ($type == "Goaler") ? "NULL AS PosC, NULL AS PosLW, NULL AS PosRW, NULL AS PosD" : $p."PosC AS PosC, ". $p ."PosLW AS PosLW, ". $p ."PosRW AS PosRW, ". $p ."PosD AS PosD " ;
 			return $pos;
 		}
 		// Returns the players current salary based on Status and Salary
-		function sql_currentSalary($prefix=false){
+		function api_sql_currentSalary($prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			$sal = "CASE ";
 			$sal .= "WHEN " . $p . "ProSalaryinFarm = 'False' AND Status1 <= 1 THEN ". $p ."Salary1/10 ";
@@ -1025,7 +1026,7 @@ function load_api_sql(){
 			return $sal;
 		}
 		// Returns current Streaks
-		function sql_playerStreak($type="Player",$prefix=false){
+		function api_sql_playerStreak($type="Player",$prefix=false){
 			$streak = "";
 			if($prefix){$p = $prefix . ".";}
 			if($type == "Player"){
@@ -1037,7 +1038,7 @@ function load_api_sql(){
 		}
 		// Returns attributes for players pending on "Player", "Goalie", "Common"
 		// Common returns all attributes that are the same between player and goalie.
-		function sql_attributes($type="Common",$prefix=false){
+		function api_sql_attributes($type="Common",$prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			if($type == "Common"){
 				$attribs = $p . "SK AS SK, ". $p ."DU AS DU, ". $p ."EN AS EN, ". $p ."SC AS SC, ". $p ."PH AS PH, ". $p ."PS AS PS, ". $p ."EX AS EX, ". $p ."LD AS LD, ". $p ."PO AS PO, ". $p ."Overall AS Overall";
@@ -1050,7 +1051,7 @@ function load_api_sql(){
 		}
 		// Returns statistics for players pending on "Player", "Goalie", "Common"
 		// Common returns all statistics that are the same between player and goalie.
-		function sql_statistics($type="Common",$prefix=false){
+		function api_sql_statistics($type="Common",$prefix=false){
 			if($prefix){$p = $prefix . ".";}
 			if($type == "Common"){
 				$stats = $p . "GP AS GP, ". $p ."SecondPlay AS SecondPlay , ". $p ."Secondplay/60 AS MinutesPlay, ". $p ."Pim AS Pim, ". $p ."Star1 AS Star1, ". $p ."Star2 AS Star2, ". $p ."Star3 AS Star3, ". $p ."EmptyNetGoal AS EmptyNetGoal, ". $p ."A AS A,";
@@ -1074,43 +1075,43 @@ function load_api_sql(){
 				$stats .= "NULL AS ShotsPercent, NULL AS MinutesPerGame, "; 
 				$stats .= "". $p ."W AS W, ". $p ."L AS L, ". $p ."OTL AS OTL, ". $p ."Shootout AS Shootout, ". $p ."GA AS GA, ". $p ."SA AS SA, ". $p ."SARebound AS SARebound, ";
 				$stats .= "". $p ."PenalityShotsShots AS PenalityShotsShots, ". $p ."PenalityShotsGoals AS PenalityShotsGoals, ". $p ."StartGoaler AS StartGoaler, ". $p ."BackupGoaler AS BackupGoaler, ";
-				$stats .= "" . sql_sp($prefix) ." AS SavePer, ". sql_gaa($prefix) ." AS GAA ";
+				$stats .= "" . api_sql_sp($prefix) ." AS SavePer, ". api_sql_gaa($prefix) ." AS GAA ";
 			}
 			return $stats;
 		}
 		// Returns fields for captains.
-		function sql_captains(){
+		function api_sql_captains(){
 			return "c.Captain AS Captain, a1.Assistant1 AS Assistant1, a2.Assistant2 AS Assistant2 ";
 		}
 		// Returns basic fields for team info. 
-		function sql_player_teaminfo(){
+		function api_sql_player_teaminfo(){
 			return "i.Name AS TeamName, pi.Name AS ProTeamName, pi.Abbre AS ProTeamAbbre, i.Abbre AS Abbre, i.City AS City ";
 		}
 
 	// Select Calls for players. $type = "Player" or "Goaler" 
-	function sql_players_select($type="Player"){
+	function api_sql_players_select($type="Player"){
 		$t = $type . "Info.";
 		$sql = "SELECT " . $t ."Number AS Number, " . $t ."Name AS Name, ";
-		$sql .= "" . sql_position($type,$type . "Info") ." AS Position, ". sql_position_number($type,$type . "Info") ." AS PositionNumber, ". sql_position_string($type,$type . "Info") ." AS PositionString, ". sql_position_all($type,$type . "Info") .", ";
+		$sql .= "" . api_sql_position($type,$type . "Info") ." AS Position, ". api_sql_position_number($type,$type . "Info") ." AS PositionNumber, ". api_sql_position_string($type,$type . "Info") ." AS PositionString, ". api_sql_position_all($type,$type . "Info") .", ";
 		$sql .= "" . $t ."Country AS Country, " . $t ."Team AS Team, " . $t ."Age AS Age, " . $t ."AgeDate AS AgeDate, " . $t ."Weight AS Weight, " . $t ."Height AS Height, ";
 		$sql .= "" . $t ."Contract AS Contract, " . $t ."Rookie AS Rookie, " . $t ."Injury AS Injury, " . $t ."NumberOfInjury AS NumberOfInjury, ";
 		$sql .= "" . $t ."ForceWaiver AS ForceWaiver, ". $t ."CanPlayPro AS CanPlayPro, ". $t ."CanPlayFarm AS CanPlayFarm, ";
-		$sql .= "" . $t ."Condition AS Condition, " . $t ."Suspension AS Suspension, " . $t ."Jersey AS Jersey, " . $t ."ProSalaryinFarm AS ProSalaryinFarm, " . sql_currentSalary($type . "Info") . " AS CurrentSalary, ";
+		$sql .= "" . $t ."Condition AS Condition, " . $t ."Suspension AS Suspension, " . $t ."Jersey AS Jersey, " . $t ."ProSalaryinFarm AS ProSalaryinFarm, " . api_sql_currentSalary($type . "Info") . " AS CurrentSalary, ";
 		$sql .= "" . $t ."Salary1 AS Salary1, " . $t ."Salary2 AS Salary2, " . $t ."Salary3 AS Salary3, " . $t ."Salary4 AS Salary4, " . $t ."Salary5 AS Salary5, ";
 		$sql .= "" . $t ."Salary6 AS Salary6, " . $t ."Salary7 AS Salary7, " . $t ."Salary8 AS Salary8, " . $t ."Salary9 AS Salary9, " . $t ."Salary10 AS Salary10, ";
 		$sql .= "" . $t ."Status1 AS Status1, " . $t ."Status2 AS Status2, " . $t ."Status3 AS Status3, " . $t ."Status4 AS Status4, " . $t ."Status5 AS Status5, ";
 		$sql .= "" . $t ."Status6 AS Status6, " . $t ."Status7 AS Status7, " . $t ."Status8 AS Status8, " . $t ."Status9 AS Status9, " . $t ."Status10 AS Status10, ";
-		$sql .= sql_playerStreak($type,$type . "Info") . ", ";
-		$sql .= sql_attributes("Common",$type . "Info") . ", ";
-		$sql .= sql_attributes($type,$type . "Info") . ", ";
-		$sql .= sql_statistics("Common","s") . ", ";
-		$sql .= sql_statistics($type,"s") . ", ";
-		$sql .= sql_captains() . ", ";
-		$sql .= sql_player_teaminfo() . "";
+		$sql .= api_sql_playerStreak($type,$type . "Info") . ", ";
+		$sql .= api_sql_attributes("Common",$type . "Info") . ", ";
+		$sql .= api_sql_attributes($type,$type . "Info") . ", ";
+		$sql .= api_sql_statistics("Common","s") . ", ";
+		$sql .= api_sql_statistics($type,"s") . ", ";
+		$sql .= api_sql_captains() . ", ";
+		$sql .= api_sql_player_teaminfo() . "";
 		return $sql;	
 	}
 	// Joins for player calls
-	function sql_players_joins($type="Players",$isPro=true){
+	function api_sql_players_joins($type="Players",$isPro=true){
 		$t = (!$isPro) ? "Farm" : "Pro";
 		$sql = "LEFT JOIN Team". $t ."Info AS i ON i.Number = " . $type . "Info.Team ";
 		$sql .= "LEFT JOIN TeamProInfo AS pi ON pi.Number = " . $type . "Info.Team ";
@@ -1121,31 +1122,31 @@ function load_api_sql(){
 		return $sql;
 	}
 	// Base call for all players, 
-	function sql_players_base($type="Player",$isPro=true){
-		$sql = sql_players_select($type);
+	function api_sql_players_base($type="Player",$isPro=true){
+		$sql = api_sql_players_select($type);
 		$sql .= "FROM ";
 		$sql .= $type . "Info ";
-		$sql .= sql_players_joins($type, $isPro);
+		$sql .= api_sql_players_joins($type, $isPro);
 		return $sql;
 	}
 	// Call to make a recordset of players based on a teamID or playerID
 	// This will be changing with future projects along the way as I can
 	// Envision more parameters needed for other things.
-	function sql_players($teamid=false,$playerid=false){
+	function api_sql_players($teamid=false,$playerid=false){
 		foreach(array("Player","Goaler") AS $type){
 			$sql .= sql_players_base($type);
 			$sql .= "WHERE " . $type . "Info.Name IS NOT NULL ";
 			
 			if($teamid)$sql .= "AND Team = " . $teamid . " ";
-			if($playerid)$sql .= "AND " . $type . "Info.Name = '" . sqlite_escape($playerid) . "' ";
+			if($playerid)$sql .= "AND " . $type . "Info.Name = '" . api_sqlite_escape($playerid) . "' ";
 			$sql .= "UNION ";
 		} 
 		$sql = rtrim($sql,"UNION ") . " ";
 		return $sql;
 	}
 	// Select all the fields needed for the roster editor.
-	function sql_roster_editor_fields($teamid){
-		$fields = fields_roster_editor_setup();
+	function api_sql_roster_editor_fields($teamid){
+		$fields = api_fields_roster_editor_setup();
 		$sql = "SELECT ";
 		foreach($fields AS $f){
 			if($f == "isAfterTradeDeadline"){
@@ -1165,8 +1166,8 @@ function load_api_sql(){
 
 		return $sql;
 	}
-	function sql_line_editor_fields(){
-		$fields = fields_line_editor_setup();
+	function api_sql_line_editor_fields(){
+		$fields = api_fields_line_editor_setup();
 		$sql = "SELECT ";
 		foreach($fields AS $f){
 			if($f == "isAfterTradeDeadline"){
