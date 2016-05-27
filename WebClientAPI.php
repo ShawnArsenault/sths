@@ -157,19 +157,20 @@ function load_api_js(){
 }
 
 function load_api_layout(){
-	function api_layout_header($id=false,$db=false){?>
+	function api_layout_header($id=false,$db=false,$headcode=""){?>
 		<!DOCTYPE html>
 			<html>
 			<head>
 				<meta name="author" content="Shawn Arsenault" />
 				<meta name="description" content="Tools for the STHS Simulator" />
 				<meta name="keywords" content="STHS, Fantasy, Hockey, Simulator" />
-				<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 				<meta name="viewport" content="width=device-width" />
 				<meta http-equiv="cache-control" content="max-age=0" />
 				<meta http-equiv="cache-control" content="no-cache" />
 				<meta http-equiv="expires" content="0" />
 				<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+				<title>STHS WebEditor</title>
 				<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 				<link rel="stylesheet" href="css/required.css">
 				<link rel="stylesheet" href="css/labs.css">
@@ -210,6 +211,7 @@ function load_api_layout(){
 						
 						echo api_script_team_array($db); 
 					}
+				if($headcode != ""){echo $headcode;}
 				?>
 
 			</head>
@@ -469,7 +471,7 @@ function load_api_pageinfo(){
 															// playerrow class is the class JQuery is looking for to allow the drag and drop process
 															// if an <li> field has this, it can potentially be moved up and down the column.
 															?>
-															<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?>"class="playerrow <?= $columnid . $inj; ?>">
+															<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?> "class="playerrow <?= $columnid . $inj; ?>">
 																<div class="rowinfo">
 																	<?php 
 																	// Use a hidden field in the form to get the info to save to the SQLite DB.
@@ -638,7 +640,7 @@ function load_api_pageinfo(){
 							?>
 							<li id="line1_<?= api_MakeCSSClass($row["Name"])?>" class="option">
 								<input name="sltPlayerList" type="radio" id="a<?= api_MakeCSSClass($row["Name"]); ?>" <?= $s;?> value="<?= $values; ?>">
-								<label for="a<?= api_MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</label>
+								<label for="a<?= api_MakeCSSClass($row["Name"]); ?>"><?= $row["Name"];?> - <?= $row["PositionString"];?> <span class="smalllist">(<?= $row["Overall"]; ?>OV)</span></label>
 							</li><?php 
 						}?>
 						<li class="option">
@@ -879,9 +881,9 @@ function load_api_pageinfo(){
 	function api_make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
 		<?php $use = ($strat) ? "Strat" : "Time";?>
 		<?php $id = $field . $sid; ?>
-		<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="">
+		<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="&#160;">
 		<input readonly size="1" id="<?= $id?>" class="stratval" type="text" name="txtStrategies[<?= $id ?>]" value="<?= $row[$id] ?>">
-		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="">
+		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="&#160;">
 		<?php 
 	}
 	function api_get_fields($db,$customOTlines){
