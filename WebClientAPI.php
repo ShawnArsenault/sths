@@ -473,7 +473,7 @@ function load_api_pageinfo(){
 																	// playerrow class is the class JQuery is looking for to allow the drag and drop process
 																	// if an <li> field has this, it can potentially be moved up and down the column.
 																	?>
-																	<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?> "class="playerrow <?= $columnid . $inj; ?>">
+																	<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?>" class="playerrow <?= $columnid . $inj; ?>">
 																		<div class="rowinfo">
 																			<?php 
 																			// Use a hidden field in the form to get the info to save to the SQLite DB.
