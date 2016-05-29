@@ -44,7 +44,7 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 #lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
 #lineeditor  .linetabs {float:right;width:78%;}
 #lineeditor  .linetabs .sliders{width:87%;}
-#lineeditor  .linetabs .stratlabel{margin-top:3px;width:30px;}
+#lineeditor  .linetabs .stratlabel{margin-top:3px;}
 
 #lineeditor  .linetabs .textname:hover{cursor:default;}
 #lineeditor  option{padding:1px 0px 0px 5px;}
@@ -83,7 +83,7 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 .linetabs .positionlabel{width:30px;float:left;}
 .linetabs .strategywrapper{overflow:hidden;margin-bottom:3px;padding-bottom:3px;border-bottom:1px solid #e8e8e8;}
 .linetabs .strats{overflow:hidden;float:left;}
-.linetabs .stratlabel{float:left;width:40px;}
+.linetabs .stratlabel{float:left;}
 .linetabs .stratvalue{float:left;width:20px;}
 .linetabs .timelabel{float:left;width:60px;}
 .linetabs .timevalue{float:left;width:20px;}

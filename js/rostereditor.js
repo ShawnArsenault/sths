@@ -127,7 +127,8 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 	    		}else{
 		    		if (g == 1 && status >= 2){
 		    			// If moving the player back up to the pros, remove the movetowaiver class.
-		    			var elem = document.getElementById('line1_'+explode[7]);
+		    			var elemLine = 'line1_' + explode[7];
+		    			var elem = document.getElementById(elemLine);
 		    			elem.className = elem.className.replace(" movetowaiver","");
 		    		}
 		    		

@@ -20,7 +20,7 @@ function update_position_list(element,byName,display){
 			exppos = expval[3].split(',');
 			for (p=0;p<exppos.length;p++) {
 				if(inArray(exppos[p],pos)){
-					document.getElementById("line1_"+expval[7]).style.display = display;
+					document.getElementById("line1_"+expval[7]).style.display = "" + display;
 					break;
 				}else{
 					// display none for li
