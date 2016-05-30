@@ -3,4 +3,6 @@ body{font-family:arial;font-size:12px;}
 .confirm{color: #4F8A10;background-color: #DFF2BF;padding:2px 5px;font-weight:bold;padding:10px;margin:10px 0px;font-size:1.2vw;}
 .positionlist{border-bottom:1px solid #999999;background-color:#cccccc;color:#333;padding:3px;font-size:0.9vw;margin-bottom:3px;}
 .positionlist label{margin-right:1.0vw;}
+h3.withsave{overflow:hidden;}
+.Save{float: right;display:inline;padding-left:20px;padding-right:20px;}
 

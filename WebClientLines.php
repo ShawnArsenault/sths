@@ -19,6 +19,7 @@
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
 
 	// Display the line editor page using API.
+	// use 5 paramaters Database, TeamID, $league("Pro","Farm") showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
 	api_pageinfo_editor_lines($db,$t,$l);
 
 	// Close the db connection

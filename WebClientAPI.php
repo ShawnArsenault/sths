@@ -39,6 +39,13 @@ function load_api_dbresults(){
 		}
 		return $row;
 	}
+	function api_dbresult_teamname($db,$teamid,$league){
+		$sql = "SELECT t.City || ' ' || t.Name || ' ('|| TRIM(t.Abbre) ||')' AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
+		return $db->querySingle($sql,true);
+	}
+	function pre_r($arr){
+		echo "<pre>"; print_r($arr); echo "</pre>";
+	}
 }
 
 function load_api_fields(){
@@ -266,19 +273,19 @@ function load_api_layout(){
 }
 
 function load_api_pageinfo(){
-	function api_pageinfo_editor_roster($db,$teamid,$showDropdown=true){
+	function api_pageinfo_editor_roster($db,$teamid,$showDropdown=true,$showHeader=true){
 		$id = "rostereditor";?>
 		<div id="<?= $id ?>">
 			<div class="pagewrapper pagewrapper<?= $id ?>"><?php 
 				// $db = sqlite DB
 				// $teamid is a teamid to use that teams roster.
 				// $showDropdown is a flag if you want to toggle between teams.
-
-				// Get Team Name for the title
-				if($teamid > 0){
-					$Query = "SELECT Name FROM TeamProInfo WHERE Number = " . $teamid;
-					$TeamInfo = $db->querySingle($Query,true);
-					If ($TeamInfo != Null){echo "<h1>" . $TeamInfo['Name'] . " Roster Editor</h1>";}
+				// $showHeader is a flag is you want to show the H1 Tag.
+				if($showHeader){
+					$row = ($teamid > 0) ? api_dbresult_teamname($db,$teamid,"Pro") : array();
+					$teamname = (!empty($row)) ? $row["FullTeamName"] . " - " : "";
+					?>
+					<h1><?= $teamname ?>Roster Editor</h1><?php
 				}
 				
 				$confirmbanner = "";
@@ -385,41 +392,9 @@ function load_api_pageinfo(){
 						} // End while loop for players in result.
 						
 						// Create a next 10 games array to see the games both Pro and Farm will play.
-						// Make the SQL for these 10 games.
-						$nextgames = array();
-						foreach(array("Pro","Farm") AS $league){
-							$count = 0;
-							$sql = "SELECT GameNumber, Day, VisitorTeamName, HomeTeamName, VisitorTeam, ";
-							$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN 'AT' ELSE 'VS' END AS AtVs, ";
-							$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN HomeTeamName ELSE VisitorTeamName END AS Opponent ";
-							$sql .= "FROM Schedule" . $league . " ";
-							$sql .= "WHERE VisitorTeam = ". $teamid ." AND Play = 'False' ";
-							$sql .= "OR HomeTeam = ". $teamid ." AND Play = 'False' ";
-							$sql .= "LIMIT 10 ";
-							$RS = $db->query($sql);
-							
-							// Loop through next 10 games result to make an array of next games for both pro and farm
-							while($row = $RS->fetchArray()){
-								$nextgames[++$count][$league]["GameNumber"] = $row["GameNumber"];
-								$nextgames[$count][$league]["Day"] = $row["Day"];
-								$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
-								$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
-							} // End while for the schedule
-						} // End foreach array(Pro,Farm)
-
-						//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
-						if(empty($nextgames)){
-							foreach(array("Pro","Farm") AS $league){
-								$nextgames[1][$league]["GameNumber"] = "";
-								$nextgames[1][$league]["Day"] = "";
-								$nextgames[1][$league]["Opponent"] = "";
-								$nextgames[1][$league]["AtVs"] = "";
-							}
-						}
-
-						// start the form to submit the roster.
-						?>
+						$nextgames = api_get_nextgames($db,$teamid);
 						
+						// start the form to submit the roster.?>
 						<form name="frmRosterEditor" method="POST" id="frmRoster">
 							<?php 
 								foreach(api_dbresult_roster_editor_fields($db,$teamid) AS $k=>$f){
@@ -439,8 +414,8 @@ function load_api_pageinfo(){
 								// Loop through the next games variable to get the lines for the next 10 games.
 								foreach($nextgames AS $nextgame=>$games){?>
 									<?php  //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-									<?php  $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-									<h3><?= $accordionhead?>
+									<?php  $accordionhead = api_make_nextgame($games,"Pro") . " | " . api_make_nextgame($games,"Farm"); ?>
+									<h3 class="withsave"><?= $accordionhead?>
 
 									<div class="Save">
 									<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
@@ -513,11 +488,13 @@ function load_api_pageinfo(){
 			</div>
 		</div><!-- End #rostereditor->$id --><?php
 	}
-	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true){
+	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true,$showHeader=true){
 		// $db = sqlite DB
 		// $teamid is a teamid to use that teams roster.
 		// $league is "Pro" or "Farm" based on selection.
 		// $showDropdown is a flag if you want to toggle between teams.
+		// $showHeader is a flag if you want to show the H1 Tag
+
 		// Set the page id
 		$id = "lineeditor";
 		
@@ -548,15 +525,6 @@ function load_api_pageinfo(){
 			$oRS = $db->query($sql);
 			$row = $oRS->fetchArray();
 			$customOTlines = ($row["CustomLines"] == "True") ? true: false;
-			
-			// Get TeamName
-			If ($league == "Pro"){
-				$Query = "SELECT Name FROM TeamProInfo WHERE Number = " . $teamid;
-			}else{
-				$Query = "SELECT Name FROM TeamFarmInfo WHERE Number = " . $teamid;
-			}
-			$TeamInfo = $db->querySingle($Query,true);
-			
 		}// end if $teamid
 
 		
@@ -617,13 +585,25 @@ function load_api_pageinfo(){
 		// Get the team selection form from the html API if needed ?>
 		<div id="<?= $id ?>">
 			<div class="pagewrapper pagewrapper<?= $id ?>"><?php 
+				if($showHeader){
+					$row = ($teamid > 0) ? api_dbresult_teamname($db,$teamid,$league) : array();
+					$teamname = (!empty($row)) ? $row["FullTeamName"] . " - " : "";
+					?>
+					<h1><?= $teamname ?>Line Editor</h1><?php
+				}
 				if($showDropdown){
 					api_html_form_teamid($db,true);
 				} // End if there is a showDropdown flag
 
 				// If there is a team selected
 				if($teamid > 0 && $league){
-					If ($TeamInfo != Null){echo "<h1>" . $TeamInfo['Name'] . " Lines Editor</h1>";}
+					// Create a next 10 games array to see the games both Pro and Farm will play.
+					$nextgames = api_get_nextgames($db,$teamid);
+					?><h3 class="withsave"><?= api_make_nextgame($nextgames[1],$league);?>
+				<div class="Save"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines" form="submissionform" /></div></h3>
+
+					<?php
+					
 					// Error block for updating feedback to the user.
 					?><div id="errors"></div><?php 
 					if($league == "Pro"){
@@ -711,7 +691,7 @@ function load_api_pageinfo(){
 								}?>	
 							</ul>
 							<?php $count = 0;?>
-							<form name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
+							<form id="submissionform" name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
 								// Loop through the tabs info making the lines pages.
 								foreach($tabs AS $i=>$t){
 									$displaytab = false;
@@ -830,7 +810,6 @@ function load_api_pageinfo(){
 										?></div><!-- end tabs-<?= $count ?>--><?php 
 									}
 								}?>
-								<div class="Save"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines"></div>
 							</form>
 						</div><!-- end tabs-->
 					</div><!-- end linetabs--><?php 
@@ -948,6 +927,35 @@ function load_api_pageinfo(){
 
 		$arr["otfields"] = array("OTForward1", "OTForward2","OTForward3","OTForward4","OTForward5","OTForward6","OTForward7","OTForward8","OTForward9","OTForward10","OTDefense1","OTDefense2","OTDefense3","OTDefense4","OTDefense5");
 		return $arr[$type];
+	}
+	function api_get_nextgames($db,$teamid){
+		$nextgames = array();
+		foreach(array("Pro","Farm") AS $league){
+			$count = 0;
+			$RS = $db->query(api_sql_next_games($teamid,$league));
+			// Loop through next 10 games result to make an array of next games for both pro and farm
+			while($row = $RS->fetchArray()){
+				$nextgames[++$count][$league]["GameNumber"] = $row["GameNumber"];
+				$nextgames[$count][$league]["Day"] = $row["Day"];
+				$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
+				$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
+			} // End while for the schedule
+		} // End foreach array(Pro,Farm)
+
+		//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
+		if(empty($nextgames)){
+			foreach(array("Pro","Farm") AS $league){
+				$nextgames[1][$league]["GameNumber"] = "";
+				$nextgames[1][$league]["Day"] = "";
+				$nextgames[1][$league]["Opponent"] = "";
+				$nextgames[1][$league]["AtVs"] = "";
+			}// End foreach Pro Farm
+		}// End if Empty nextgame
+		return $nextgames;
+	}
+	function api_make_nextgame($nextgame,$league){
+		// Return a string of the next games. if its empty, say there is no schedule.
+		return ($nextgame[$league]["Day"] != "") ? "Next Game: ". $league ." Day " . $nextgame[$league]["Day"] ." - " . $nextgame[$league]["AtVs"] . " " . $nextgame[$league]["Opponent"] ." " : $league . " - Currently No Schedule";
 	}
 }
 
@@ -1206,7 +1214,17 @@ function load_api_sql(){
 		}
 		$sql = rtrim($sql,",") . " ";
 		$sql .= "FROM LeagueWebClient;";
+		return $sql;
+	}
 
+	function api_sql_next_games($teamid,$league){
+		$sql = "SELECT GameNumber, Day, VisitorTeamName, HomeTeamName, VisitorTeam, ";
+		$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN 'at' ELSE 'vs' END AS AtVs, ";
+		$sql .= "CASE WHEN VisitorTeam = ". $teamid ." THEN HomeTeamName ELSE VisitorTeamName END AS Opponent ";
+		$sql .= "FROM Schedule" . $league . " ";
+		$sql .= "WHERE VisitorTeam = ". $teamid ." AND Play = 'False' ";
+		$sql .= "OR HomeTeam = ". $teamid ." AND Play = 'False' ";
+		$sql .= "LIMIT 10 ";
 		return $sql;
 	}
 }
