@@ -5,4 +5,5 @@ body{font-family:arial;font-size:12px;}
 .positionlist label{margin-right:1.0vw;}
 h3.withsave{overflow:hidden;}
 .Save{float: right;display:inline;padding-left:20px;padding-right:20px;}
-
+.ui-tabs{position:static;}
+.SaveButton{float:right;margin-top:-135px;}

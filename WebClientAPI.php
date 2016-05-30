@@ -599,8 +599,7 @@ function load_api_pageinfo(){
 				if($teamid > 0 && $league){
 					// Create a next 10 games array to see the games both Pro and Farm will play.
 					$nextgames = api_get_nextgames($db,$teamid);
-					?><h3 class="withsave"><?= api_make_nextgame($nextgames[1],$league);?>
-				<div class="Save"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines" form="submissionform" /></div></h3>
+					?><h3 class="withsave"><?= api_make_nextgame($nextgames[1],$league);?></h3>
 
 					<?php
 					
@@ -691,7 +690,8 @@ function load_api_pageinfo(){
 								}?>	
 							</ul>
 							<?php $count = 0;?>
-							<form id="submissionform" name="frmEditLines" method="POST" onload="checkCompleteLines();"><?php 
+							<form id="submissionform" name="frmEditLines" method="POST" onload="checkCompleteLines();">
+								<div class="SaveButton"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines" form="submissionform" /></div><?php 
 								// Loop through the tabs info making the lines pages.
 								foreach($tabs AS $i=>$t){
 									$displaytab = false;
