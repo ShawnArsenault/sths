@@ -274,6 +274,13 @@ function load_api_pageinfo(){
 				// $teamid is a teamid to use that teams roster.
 				// $showDropdown is a flag if you want to toggle between teams.
 
+				// Get Team Name for the title
+				if($teamid > 0){
+					$Query = "SELECT Name FROM TeamProInfo WHERE Number = " . $teamid;
+					$TeamInfo = $db->querySingle($Query,true);
+					If ($TeamInfo != Null){echo "<h1>" . $TeamInfo['Name'] . " Roster Editor</h1>";}
+				}
+				
 				$confirmbanner = "";
 				$sql = "";
 				$execute = false;
@@ -423,8 +430,7 @@ function load_api_pageinfo(){
 								}
 							?>
 
-							<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
-							<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
+
 							<?php  
 							// This accordion id is a JQuery accordion. If this ID changes then the JQuery has to be changed as well.
 							?>
@@ -434,7 +440,14 @@ function load_api_pageinfo(){
 								foreach($nextgames AS $nextgame=>$games){?>
 									<?php  //$accordionhead = ($games["Pro"]["Day"] != "") ? $nextgame . ". Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
 									<?php  $accordionhead = ($games["Pro"]["Day"] != "") ? "Next Game: Pro Day " . $games["Pro"]["Day"] ." - " . $games["Pro"]["AtVs"] . " " . $games["Pro"]["Opponent"] ." | Farm: Day " . $games["Farm"]["Day"] . " - " . $games["Farm"]["AtVs"] . " " . $games["Farm"]["Opponent"] : "Currently No Schedule"; ?>
-									<h3><?= $accordionhead?> <span id="linevalidate<?=$nextgame;?>"></span></h3>
+									<h3><?= $accordionhead?>
+
+									<div class="Save">
+									<!--<input type="button" id="change" value="Copy Roster 1 to other days." >-->
+									<input id="saveroster" type="submit" name="sbtRoster" value="Save Rosters">
+									</div>
+
+									<span id="linevalidate<?=$nextgame;?>"></span></h3>
 									<div>
 										<div id="rostererror<?= $nextgame ?>" class="rostererror"></div>
 										<?php api_html_checkboxes_positionlist("rosterline1","false","list-item"); ?>
@@ -535,6 +548,15 @@ function load_api_pageinfo(){
 			$oRS = $db->query($sql);
 			$row = $oRS->fetchArray();
 			$customOTlines = ($row["CustomLines"] == "True") ? true: false;
+			
+			// Get TeamName
+			If ($league == "Pro"){
+				$Query = "SELECT Name FROM TeamProInfo WHERE Number = " . $teamid;
+			}else{
+				$Query = "SELECT Name FROM TeamFarmInfo WHERE Number = " . $teamid;
+			}
+			$TeamInfo = $db->querySingle($Query,true);
+			
 		}// end if $teamid
 
 		
@@ -601,6 +623,7 @@ function load_api_pageinfo(){
 
 				// If there is a team selected
 				if($teamid > 0 && $league){
+					If ($TeamInfo != Null){echo "<h1>" . $TeamInfo['Name'] . " Lines Editor</h1>";}
 					// Error block for updating feedback to the user.
 					?><div id="errors"></div><?php 
 					if($league == "Pro"){
@@ -807,7 +830,7 @@ function load_api_pageinfo(){
 										?></div><!-- end tabs-<?= $count ?>--><?php 
 									}
 								}?>
-								<input id="linesubmit" type="submit" value="Update Lines" name="sbtUpdateLines">
+								<div class="Save"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines"></div>
 							</form>
 						</div><!-- end tabs-->
 					</div><!-- end linetabs--><?php 

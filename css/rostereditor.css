@@ -35,6 +35,7 @@
 #rostereditor .FarmDress{background-color:#cccccc;}
 #rostereditor .FarmScratch{background-color:#999999;}
 #rostereditor .movetowaiver{color: #9F6000;background-color: #FEEFB3;}
+#rostereditor .Save{float: right;display:inline;padding-left:20px;padding-right:20px;padding-bottom:10px;}
 
 @media only screen and (max-width: 90em) {
 	#rostereditor .rowinfo{float:right;overflow:hidden;width:84%;}
