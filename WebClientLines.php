@@ -1,4 +1,7 @@
 <?php
+	include "STHSSetting.php";
+	//  Get STHS Setting $Database Value
+
 	require_once("WebClientAPI.php");
 	// exempt is an array of api names.
 	// example, if you do not need the html or layout api then add as an array item
@@ -9,7 +12,7 @@
 	load_apis($exempt);
 	
 	// Make a connection variable to pass to API
-	$db = api_sqlite_connect("ANHS-STHS.db");
+	$db = api_sqlite_connect($DatabaseFile);
 
 	// Make a default header 
 	api_layout_header("lineeditor",$db);
@@ -19,7 +22,7 @@
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
 
 	// Display the line editor page using API.
-	// use 5 paramaters Database, TeamID, $league("Pro","Farm") showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
+	// use 5 paramaters Database, TeamID, $league("Pro","Farm"), showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
 	api_pageinfo_editor_lines($db,$t,$l);
 
 	// Close the db connection

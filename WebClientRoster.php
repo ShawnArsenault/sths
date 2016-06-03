@@ -1,4 +1,7 @@
 <?php
+	include "STHSSetting.php";
+	//  Get STHS Setting $Database Value	
+
 	require_once("WebClientAPI.php");
 	// exempt is an array of api names.
 	// example, if you do not need the html or layout api then add as an array item
@@ -9,7 +12,7 @@
 	load_apis($exempt);
 	
 	// Make a connection variable to pass to API
-	$db = api_sqlite_connect("ANHS-STHS.db");
+	$db = api_sqlite_connect($DatabaseFile);
 
 	// Make a default header 
 	// 3 Paramaters. PageID, database, $headcode (custom headercode can be added. DEFAULT "")

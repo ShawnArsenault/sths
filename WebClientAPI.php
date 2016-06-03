@@ -40,7 +40,7 @@ function load_api_dbresults(){
 		return $row;
 	}
 	function api_dbresult_teamname($db,$teamid,$league){
-		$sql = "SELECT t.City || ' ' || t.Name || ' ('|| TRIM(t.Abbre) ||')' AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
+		$sql = "SELECT t.Name AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
 		return $db->querySingle($sql,true);
 	}
 	function pre_r($arr){
