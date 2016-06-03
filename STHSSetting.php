@@ -1,4 +1,4 @@
 ﻿<?php
-$DatabaseFile = (string)"ANHS-PLF-STHS.db";
-$CareerStatDatabaseFile = (string)"ANHS-PLF-STHSCareerStat.db";
+$DatabaseFile = (string)"ANHS-STHS.db";
+$CareerStatDatabaseFile = (string)"ANHS-STHSCareerStat.db";
 ?>
