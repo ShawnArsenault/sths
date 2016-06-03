@@ -24,6 +24,9 @@ function load_api(){
 		$ret = strtolower($ret);
 		return $ret;
 	}
+	function api_pre_r($arr){
+		echo "<pre>"; print_r($arr); echo "</pre>";
+	}
 }
 
 function load_api_dbresults(){
@@ -42,9 +45,6 @@ function load_api_dbresults(){
 	function api_dbresult_teamname($db,$teamid,$league){
 		$sql = "SELECT t.Name AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
 		return $db->querySingle($sql,true);
-	}
-	function pre_r($arr){
-		echo "<pre>"; print_r($arr); echo "</pre>";
 	}
 }
 
@@ -324,7 +324,6 @@ function load_api_pageinfo(){
 							}// End if count($explodeValue)
 						} // End foreach $status
 					} // End foreach $_POST["txtRoster"]
-					//pre_r($_POST);
 					// If there is something in the arrSort variable, then:
 					// Loop through the arrSort variable to make 1 individual line of SQL
 					// Per player to update the Status values in the DB.

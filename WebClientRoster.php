@@ -1,5 +1,5 @@
 <?php
-	include "STHSSetting.php";
+	require_once("STHSSetting.php");
 	//  Get STHS Setting $Database Value	
 
 	require_once("WebClientAPI.php");
