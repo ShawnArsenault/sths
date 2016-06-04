@@ -35,7 +35,7 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
     font-weight:500;
 }
 
-#lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:160px;height:auto;margin-left:10px;}
+#lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:190px;height:auto;margin-left:10px;}
 #lineeditor  #tabs .linesection input[type=button]{padding:0px 0px;text-align:center;margin-top:3px;}
 #lineeditor  #tabs .linesection input.textname {width:80%;border:1px solid #e8e8e8;padding:1px 5px;}
 
@@ -85,7 +85,7 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 .linetabs .strats{overflow:hidden;float:left;}
 .linetabs .stratlabel{float:left;}
 .linetabs .stratvalue{float:left;width:20px;}
-.linetabs .timelabel{float:left;width:60px;}
+.linetabs .timelabel{float:left;}
 .linetabs .timevalue{float:left;width:20px;}
 .linetabs .startinggoalie{margin-bottom:10px;}
 

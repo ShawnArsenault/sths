@@ -531,9 +531,9 @@ function load_api_pageinfo(){
 		// If the updatelines submit button is clicked 
 		if(isset($_POST["sbtUpdateLines"])){
 			$fminfo = "";
-			$dbfields = api_get_fields($db,$customOTlines);
+			$dbfields = api_get_fields($db,$customOTlines,$league);
 			$fmfields = array_merge($_POST["txtLine"],$_POST["txtStrategies"]);
-			$sql = "SELECT " . implode(" || ',' || ", $dbfields) . " AS LineValues FROM Team". $_REQUEST["League"] ."Lines WHERE TeamNumber = " . $_REQUEST["TeamID"] . " AND Day = 1;";
+			$sql = "SELECT " . implode(" || ',' || ", $dbfields) . " AS LineValues FROM Team". $league ."Lines WHERE TeamNumber = " . $teamid . " AND Day = 1;";
 			$oRS = $db->query($sql);
 			$row = $oRS->fetchArray();
 			$dbinfo = $row["LineValues"];
@@ -549,8 +549,8 @@ function load_api_pageinfo(){
 				// Need 2 running query strings: one for the regular lines table
 				// And one for the numberonly table.
 				// For now this will update all 10 game slots for lines.
-				$sql   = "UPDATE Team". $_REQUEST["League"] ."Lines SET ";
-				$sqlno = "UPDATE Team". $_REQUEST["League"] ."LinesNumberOnly SET ";
+				$sql   = "UPDATE Team". $league ."Lines SET ";
+				$sqlno = "UPDATE Team". $league ."LinesNumberOnly SET ";
 
 				foreach($dbfields AS $i=>$f){
 					if($arrDB[$i] != $arrFM[$i]){
@@ -569,8 +569,8 @@ function load_api_pageinfo(){
 				$sql = rtrim($sql,", ");
 				$sqlno .= " WebClientModify = 'True' ";
 
-				$sql .= " WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
-				$sqlno .= " WHERE TeamNumber = " . $_REQUEST["TeamID"] . ";";
+				$sql .= " WHERE TeamNumber = " . $teamid . ";";
+				$sqlno .= " WHERE TeamNumber = " . $teamid . ";";
 				$db->exec("pragma journal_mode=memory;");
 				$db->exec($sql);
 				$db->exec($sqlno);	
@@ -690,7 +690,10 @@ function load_api_pageinfo(){
 							</ul>
 							<?php $count = 0;?>
 							<form id="submissionform" name="frmEditLines" method="POST" onload="checkCompleteLines();">
-								<div class="SaveButton"><input id="linesubmit" type="submit" value="Save Lines" name="sbtUpdateLines" form="submissionform" /></div><?php 
+								<?php
+									$buttontext = (api_has_saved_lines($db,$teamid,$league)) ? "Re-Save Lines" : "Save Lines";
+								?>
+								<div class="SaveButton"><input id="linesubmit" type="submit" value="<?= $buttontext?>" name="sbtUpdateLines" form="submissionform" /></div><?php 
 								// Loop through the tabs info making the lines pages.
 								foreach($tabs AS $i=>$t){
 									$displaytab = false;
@@ -890,9 +893,9 @@ function load_api_pageinfo(){
 		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="&#160;">
 		<?php 
 	}
-	function api_get_fields($db,$customOTlines){
+	function api_get_fields($db,$customOTlines,$league){
 		// Make an array of field names in the DB.
-		$sql = "PRAGMA table_info(Team". $_REQUEST["League"] ."Lines);";
+		$sql = "PRAGMA table_info(Team". $league ."Lines);";
 		$oRS = $db->query($sql);
 		$count = 0;
 		$addfield = false;
@@ -955,6 +958,11 @@ function load_api_pageinfo(){
 	function api_make_nextgame($nextgame,$league){
 		// Return a string of the next games. if its empty, say there is no schedule.
 		return ($nextgame[$league]["Day"] != "") ? "Next Game: ". $league ." Day " . $nextgame[$league]["Day"] ." - " . $nextgame[$league]["AtVs"] . " " . $nextgame[$league]["Opponent"] ." " : $league . " - Currently No Schedule";
+	}
+	function api_has_saved_lines($db,$tid,$l){
+		$oRS = $db->query("SELECT WebClientModify FROM Team". $l ."LinesNumberOnly WHERE TeamNumber = " . $tid . " AND Day = 1;");
+		$row = $oRS->fetchArray();
+		return ($row["WebClientModify"] == "True") ? true : false;
 	}
 }
 
