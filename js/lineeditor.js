@@ -434,7 +434,7 @@ function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLine
 	
 	if(errors.trim() === ""){
 		headertext = "Lines are Complete";
-		headerstyle = "confirm";
+		headerstyle = "linescomplete";
 		disabled = false;
 	}else{
 		headertext = "Incomplete Lines";

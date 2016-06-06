@@ -77,8 +77,7 @@ function load_api_fields(){
 
 function load_api_html(){
 	// Create a dropdown with all teams
-	function api_html_form_teamid($db,$farm=false){
-		$teamid = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : "";
+	function api_html_form_teamid($db,$teamid,$farm=false){
 		$proLeague = (isset($_REQUEST["League"]) && $_REQUEST["League"] == "Farm") ? false : true;
 		?>
 		<form name="frmTeams">
@@ -164,7 +163,7 @@ function load_api_js(){
 }
 
 function load_api_layout(){
-	function api_layout_header($id=false,$db=false,$headcode=""){?>
+	function api_layout_header($id=false,$db=false,$teamid,$league=false,$headcode=""){?>
 		<!DOCTYPE html>
 			<html>
 			<head>
@@ -202,21 +201,21 @@ function load_api_layout(){
 					// Check for $id for rostereditor page. 
 					// If we are on the roster editor page, the body tage needs an onload function to validate the rosters at default.
 					// If so and a team is selected, create the onload attribute with the js_function_roster_validator to placein the body tag. 
-					if($id == "rostereditor" && array_key_exists("TeamID", $_REQUEST)){  
+					if($id == "rostereditor" && $teamid > 0){  
 						api_jquery_call_jquery();
-						$jsfunction = api_js_function_roster_validator($db,$_REQUEST["TeamID"]);
+						$jsfunction = api_js_function_roster_validator($db,$teamid);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						// Add the jquery for draggable columns.
 						api_jquery_roster_editor_draggable($jsfunction);
 					}
 				?>
 				<?php
-					if($id == "lineeditor" && isset($_REQUEST["TeamID"]) && isset($_REQUEST["League"])){
+					if($id == "lineeditor" && $teamid > 0 && $league){
 						api_jquery_call_jquery();
 						$jsfunction = api_js_function_line_validator($db);
 						$onload = " onLoad=\"". $jsfunction ."\"";
 						
-						echo api_script_team_array($db); 
+						echo api_script_team_array($db,$teamid); 
 					}
 				if($headcode != ""){echo $headcode;}
 				?>
@@ -231,18 +230,17 @@ function load_api_layout(){
 		?></body></html><?php
 	}
 
-	function api_script_team_array($db){
+	function api_script_team_array($db,$teamid){
 		$pos = array(0=>"C",1=>"LW",2=>"RW",3=>"D",4=>"G",);
 		$position = array();
 		foreach(array(3=>"Pro",1=>"Farm") AS $status=>$league){
 			$isPro = ($status == 3) ? true: false;
 			$SQL = api_sql_players_base("Player",$isPro);
-			$SQL .= "WHERE Team = " . $_REQUEST["TeamID"]  . " AND Status1 = ". $status ." ";
+			$SQL .= "WHERE Team = " . $teamid  . " AND Status1 = ". $status ." ";
 			$SQL .= "UNION ";
 			$SQL .= api_sql_players_base("Goaler",$isPro);
-			$SQL .= "WHERE Team = " . $_REQUEST["TeamID"]  . " AND Status1 = ". $status ." ";
+			$SQL .= "WHERE Team = " . $teamid  . " AND Status1 = ". $status ." ";
 			$SQL .= "ORDER BY PositionNumber, Name ";
-			
 			$oRS = $db->query($SQL);	
 			while($row = $oRS->fetchArray()){
 				foreach($pos AS $id=>$p){
@@ -352,7 +350,7 @@ function load_api_pageinfo(){
 				
 				// Get the team selection form from the html API if needed
 				if($showDropdown){
-					api_html_form_teamid($db);
+					api_html_form_teamid($db,$teamid);
 				} // End if there is a showDropdown flag
 
 				// If there is a team ID to use
@@ -591,7 +589,7 @@ function load_api_pageinfo(){
 					<h1><?= $teamname ?>Line Editor</h1><?php
 				}
 				if($showDropdown){
-					api_html_form_teamid($db,true);
+					api_html_form_teamid($db,$teamid,true);
 				} // End if there is a showDropdown flag
 
 				// If there is a team selected

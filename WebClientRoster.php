@@ -13,13 +13,13 @@
 	
 	// Make a connection variable to pass to API
 	$db = api_sqlite_connect($DatabaseFile);
-
-	// Make a default header 
-	// 3 Paramaters. PageID, database, $headcode (custom headercode can be added. DEFAULT "")
-	api_layout_header("rostereditor",$db);
-
+	
 	// Look for a team ID in the URL, if non exists use 0
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
+
+	// Make a default header 
+	// 5 Paramaters. PageID, database, teamid, League = Pro/Farm, $headcode (custom headercode can be added. DEFAULT "")
+	api_layout_header("rostereditor",$db,$t,false,$headcode);
 
 
 	// Display the roster editor page using API.

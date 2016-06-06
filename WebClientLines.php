@@ -14,12 +14,12 @@
 	// Make a connection variable to pass to API
 	$db = api_sqlite_connect($DatabaseFile);
 
-	// Make a default header 
-	api_layout_header("lineeditor",$db);
-
 	// Look for a team ID in the URL, if non exists use 0
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
+
+	// Make a default header 
+	api_layout_header("lineeditor",$db,$t,$l,$headcode);
 
 	// Display the line editor page using API.
 	// use 5 paramaters Database, TeamID, $league("Pro","Farm"), showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
