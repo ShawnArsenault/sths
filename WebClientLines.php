@@ -19,7 +19,7 @@
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
 
 	// Make a default header 
-	api_layout_header("lineeditor",$db,$t,$l,$headcode);
+	api_layout_header("lineeditor",$db,$t,$l,$WebClientHeadCode);
 
 	// Display the line editor page using API.
 	// use 5 paramaters Database, TeamID, $league("Pro","Farm"), showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   

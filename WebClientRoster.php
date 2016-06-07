@@ -19,7 +19,7 @@
 
 	// Make a default header 
 	// 5 Paramaters. PageID, database, teamid, League = Pro/Farm, $headcode (custom headercode can be added. DEFAULT "")
-	api_layout_header("rostereditor",$db,$t,false,$headcode);
+	api_layout_header("rostereditor",$db,$t,false,$WebClientHeadCode);
 
 
 	// Display the roster editor page using API.
