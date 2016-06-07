@@ -176,7 +176,19 @@ function load_api_layout(){
 				<meta http-equiv="cache-control" content="no-cache" />
 				<meta http-equiv="expires" content="0" />
 				<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
-				<title>STHS WebEditor</title>
+				<title>STHS WebEditor - 
+				<?php
+					if($id == "rostereditor" && $teamid > 0){  
+						$row = ($teamid > 0) ? api_dbresult_teamname($db,$teamid,"Pro") : array();
+						$teamname = (!empty($row)) ? $row["FullTeamName"] . " - " : "";
+						echo $teamname . "Roster Editor";
+					}elseif($id == "lineeditor" && $teamid > 0 && $league){
+						$row = ($teamid > 0) ? api_dbresult_teamname($db,$teamid,$league) : array();
+						$teamname = (!empty($row)) ? $row["FullTeamName"] . " - " : "";
+						echo $teamname . "Line Editor";
+					}
+				?>
+				</title>
 				<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 				<link rel="stylesheet" href="css/required.css">
 				<link rel="stylesheet" href="css/labs.css">
