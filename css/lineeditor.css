@@ -41,9 +41,9 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 
 #lineeditor  .playerlist{width:20%;float:left;border:1px solid #666666;margin:2px; padding:2px;}
 #lineeditor  .playerlist select{width:100%; -webkit-appearance: menulist-textfield;border-width:0px;}
-#lineeditor  .stratval{width:15px;font-size:11px;text-align: center;border:1px solid #cccccc;}
+#lineeditor  .stratval{text-align: center;border:1px solid #cccccc;}
 #lineeditor  .linetabs {float:right;width:78%;}
-#lineeditor  .linetabs .sliders{width:87%;}
+#lineeditor  .linetabs .sliders{width:98%;}
 #lineeditor  .linetabs .stratlabel{margin-top:3px;}
 
 #lineeditor  .linetabs .textname:hover{cursor:default;}
@@ -51,7 +51,7 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 #lineeditor  option + option{border-top:1px dotted #cccccc;}
 
 #lineeditor  .linetabs .stratvalue{width:80px;}
-#lineeditor  .linetabs .timevalue{width:80px;}
+#lineeditor  .linetabs .timevalue{/*width:80px;*/}
 
 #lineeditor  .updown{width:12px;background-repeat:no-repeat;border-width:0px;background-color: transparent;background-position:center center;}
 #lineeditor  .up {background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjFCMUU3QUUxNEMxQzExRTVBNTQ4OEM1RkJFQTQ4MkNBIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjFCMUU3QUUyNEMxQzExRTVBNTQ4OEM1RkJFQTQ4MkNBIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MUIxRTdBREY0QzFDMTFFNUE1NDg4QzVGQkVBNDgyQ0EiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MUIxRTdBRTA0QzFDMTFFNUE1NDg4QzVGQkVBNDgyQ0EiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4Rx+9MAAABRklEQVR42mI8cur6nTt3nz59xsbGxoAKfv36JS0tpaGhzgJUoSQvZayvzsTEBJQQFRUFkq9fvwaS//79+/Dxy5Ur11iAZlib66koyUJ0nzh+DEhaWFpBuDdvP9ix5zAL0JafP3/BrcjJzQOSZ86cgXC/f//BwcHBAmT9/v0broiPjw/ZWSysrAz//7NA3HHgwIH6hgYmRqYLF87////f0dHx759f7e0d6lqGQAUgxzL8/8fw/w/DX6B5f/79+8PExAw2gx0k8/8/iA3yy6sXDo7OBw+7ANl2dtYcHDy7du2EWHfl2h2oIlZ2LgYGRojo168/vn37CXcTJFxYgCHGzo4IxqlTJzOArYAANlbWHz9+sgDD9PmLN0AWRJOyqi6QvHbjHiQw33/4rKgozwIM9StXrz148IgdI1p+/vqloCBnaKgPEGAADaOEApnhhG0AAAAASUVORK5CYII=');margin:2px 0px 0px -4px;}
@@ -73,12 +73,14 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
     font-size:1.0vw;
 }
 
-.linetabs .blockcontainer{font-size:0.8em;padding:0px 10px;}
+.linetabs .blockcontainer{/*font-size:0.8em;*/padding:0px 10px;}
 .linetabs .linesection{position:relative;height:150px;width:22.5%;border:1px solid #cccccc;float:left;padding:5px 5px 5px 5px;box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);}
 .linetabs .linesection + .linesection{margin-left:10px;}
-.linetabs .sliders{position:absolute;bottom:5px;background-color:#f3f3f1;padding:3px;}
+.linetabs .sliders{background-color:#f3f3f1;padding:3px;margin-top:3px;overflow:hidden;}
+#lineeditor .linetabs .iddefense .sliders,#lineeditor .linetabs .id4vs4 .sliders,#lineeditor .linetabs .idpk4 .sliders,#lineeditor .linetabs .idpk3 .sliders{position:absolute;bottom:5px;width:92%;}
+
 .linetabs .positionwrapper{overflow:hidden;}
-.linetabs .positionline{clear:both;}
+.linetabs .positionline{clear:both;overflow:hidden;}
 .linetabs .positionline + .positionline{margin-top:3px;padding-top:3px;border-top:1px dotted #cccccc;}
 .linetabs .positionlabel{width:30px;float:left;}
 .linetabs .strategywrapper{overflow:hidden;margin-bottom:3px;padding-bottom:3px;border-bottom:1px solid #e8e8e8;}
@@ -86,14 +88,17 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 .linetabs .stratlabel{float:left;}
 .linetabs .stratvalue{float:left;width:20px;}
 .linetabs .timelabel{float:left;}
-.linetabs .timevalue{float:left;width:20px;}
+.linetabs .timevalue{float:left;/*width:20px;*/}
 .linetabs .startinggoalie{margin-bottom:10px;}
 
+.smalllist{font-size:0.9vw;padding-left:0.5vw;}
 
-.smalllist{font-size:0.7vw;padding-left:0.4vw;font-style: italic;}
+.teamstrategy{overflow:hidden;}
+.strategyamount{float:left;padding:0px 10px;}
+.strategystrategies{float:right;background-color:#e8e8e8;padding:0px 10px;margin-right:0px;}
+.strategieswrapper input[type=text]{text-align:center;}
 
-
-
+#lineeditor #tabs .strategieswrapper{width:98%;margin-left:0px;}
 
 @media screen and (max-width: 80em) {
 	#lineeditor  #tabs .linesection{width:45%;margin-bottom:10px;min-height:160px;height:auto;}
@@ -107,11 +112,12 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 	    min-height: 160px;
 	    width: 96%;
 	}
+	.strategyamount{width:50%;}
 
-	
+	.linetabs .stratvalue{float:right;}
 
 	#lineeditor ul.positiontabs li a{
-		background: transparent url("images/arrows.gif") no-repeat scroll center 3.3vw;
+		
 	    padding: 2px 1.0vw 1.0vw 1.0vw;
 	    text-decoration: none;
 		}
@@ -123,22 +129,27 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 	    padding: 1em 0em;
 	}
 	
-
+	.strategieswrapper{font-size:1.5vw;}
+	.strategieswrapper input[type=text]{font-size:1.5vw;}
+	.PullGoalerMinGoal input[type=text],.PullGoalerMinPct input[type=text]{width:4.0vw;}
 
 	.positionwrapper{
-		width:68%;
+		width:60%;
 		float:left;
+		font-size:1.5vw;
 	}
 	#lineeditor .linetabs .sliders {
 		position:static;
 		float:right;
-		width:27%;
+		width:auto;
+		font-size:1.5vw;
 	}
 
+	#lineeditor .linetabs .sliders input[type=text]{font-size:1.5vw;}
 	.positionname{float:left;width:80%;}
 	.linetabs .strats{float:none;}
 	.linetabs #tabs li{font-size:1.3vw;}
-
+	.timevalue input[type=text]{width:4.0vw;}
     
 	
 }
