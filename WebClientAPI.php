@@ -59,7 +59,7 @@ function load_api_fields(){
 	function api_fields_line_editor_setup(){
 		return  array(	"BlockPlayerFromPlayingLines12","BlockPlayerFromPlayingLines123","BlockPlayerFromPlayingLines12inPPPK",
 						"ProForceGameStrategiesTo","ProForceGameStrategiesAt5","FarmForceGameStrategiesTo","FarmForceGameStrategiesAt5",
-						"PullGoalerMinGoal","PullGoalerMinPct","PullGoalerRemoveGoaliesSecond");
+						"PullGoalerMinGoal","PullGoalerMinGoalEnforce","PullGoalerMinPct","PullGoalerRemoveGoaliesSecond","PullGoalerMax");
 	}
 	function api_fields_input_values($row){
 		$value = $row["Name"] ."|";
@@ -158,7 +158,8 @@ function load_api_js(){
 		foreach(array_keys($jsRow) AS $k){
 			if(!is_numeric($k))$f .= (!is_numeric($jsRow[$k])) ? strtolower($jsRow[$k]) . "," : $jsRow[$k] .",";
 		}
-		return "line_validator(". rtrim($f,",") .");";
+		$ret = "line_validator(". rtrim($f,",") .");";
+		return $ret;
 	}
 }
 

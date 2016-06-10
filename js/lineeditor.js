@@ -1,6 +1,7 @@
 function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
 						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
-						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
+						PullGoalerMinGoal,PullGoalerMinGoalEnforce,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond,PullGoalerMax){
+
 	var fieldvalue = parseInt(document.getElementById(field).value);
 	var curvalue = (updown == 'up') ? fieldvalue + 1 : fieldvalue - 1;
 	var curtotal = 0;
@@ -10,7 +11,7 @@ function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlay
 	var vallast = 100000000;
 	var flag = false;
 	var typesplit = type.split("-");
-	if(type == 'Strat'){		
+	if(type == 'Strat'){	
 		var fOF = document.getElementById(sid + 'OF').value;
 		var fDF = document.getElementById(sid + 'DF').value;
 		var fPhy = document.getElementById(sid + 'Phy').value;
@@ -19,9 +20,31 @@ function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlay
 		
 		if(updown == 'up' && curtotal < maxmin && fieldvalue < maxmin){document.getElementById(field).value = curvalue;}
 		if(updown == 'down' && curtotal > maxmin && fieldvalue > maxmin){document.getElementById(field).value = curvalue;}
-	}else if(typesplit[0] == "Int"){
+	}else if(typesplit[0] == 'Int'){
+		switch(field){
+			case 'Strategy1GoalDiff':
+				maxmin = (updown == 'up') ? (typesplit[1]-1) : parseInt(document.getElementById('Strategy2GoalDiff').value) + 1;
+			break;
+			case 'Strategy2GoalDiff':
+				maxmin = (updown == 'up') ? parseInt(document.getElementById('Strategy1GoalDiff').value) - 1 : 1;
+			break;
+			case 'Strategy4GoalDiff':
+				maxmin = (updown == 'up') ? parseInt(document.getElementById('Strategy5GoalDiff').value) - 1 : 1;
+			break;
+			case 'Strategy5GoalDiff':
+				maxmin = (updown == 'up') ? (typesplit[1]-1) : parseInt(document.getElementById('Strategy4GoalDiff').value) + 1;
+			break;
+			case 'RemoveGoaliesSecond':
+				maxmin = (updown == 'up') ? PullGoalerMax : 0;
+			break;
+			case 'PullGoalerMinGoal':
+				maxmin = (updown == 'up') ? 10 : PullGoalerMinGoalEnforce;
+			break;
+			default:
+				maxmin = (updown == 'up') ? (typesplit[1]-1): 1;
+			break;
+		}
 		
-		maxmin = (updown == 'up') ? (typesplit[1]-1): 1;
 		if(!flag && updown == 'up' && curvalue <= maxmin){document.getElementById(field).value = curvalue;}
 		if(!flag && updown == 'down' && curvalue >= maxmin){document.getElementById(field).value = curvalue;}
 	}else{
@@ -103,7 +126,7 @@ function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlay
 	}
 	line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
 						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
-						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond);	
+						PullGoalerMinGoal,PullGoalerMinGoalEnforce,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond,PullGoalerMax);	
 }
 function getGroups(){
 	var group = [];
@@ -330,7 +353,7 @@ function findPlayerInRoster(selected,type,league){
 
 	return foundIt;
 }
-function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
+function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinGoalEnforce,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond,PullGoalerMax){
 	var selected = document.querySelector('input[name="sltPlayerList"]:checked').value;
 	var explode = selected.split("|");
 	var groups = getGroups();
@@ -368,7 +391,7 @@ function ChangePlayer(id,league,BlockPlayerFromPlayingLines12,BlockPlayerFromPla
 		document.getElementById(id).value = explode[0];
 		line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,
 						ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,
-						PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond);
+						PullGoalerMinGoal,PullGoalerMinGoalEnforce,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond,PullGoalerMax);
 	};
 }
 function verifyBlockPlayerFromPlaying(Lines12,Lines123,Lines12inPPPK){
@@ -423,7 +446,7 @@ function verifyBlockPlayerFromPlaying(Lines12,Lines123,Lines12inPPPK){
 	}
 	return errortext;
 }
-function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond){
+function line_validator(BlockPlayerFromPlayingLines12,BlockPlayerFromPlayingLines123,BlockPlayerFromPlayingLines12inPPPK,ProForceGameStrategiesTo,ProForceGameStrategiesAt5,FarmForceGameStrategiesTo,FarmForceGameStrategiesAt5,PullGoalerMinGoal,PullGoalerMinGoalEnforce,PullGoalerMinPct,PullGoalerRemoveGoaliesSecond,PullGoalerMax){
 	var headertext = '';
 	var headerstyle = '';
 	var display = '';

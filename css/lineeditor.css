@@ -145,11 +145,16 @@ background: transparent  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcA
 		font-size:1.5vw;
 	}
 
+	.linetabs .timelabel{/*float:left;*/}
+	.linetabs .timevalue{float:left;/*width:20px;*/}
+
 	#lineeditor .linetabs .sliders input[type=text]{font-size:1.5vw;}
 	.positionname{float:left;width:80%;}
 	.linetabs .strats{float:none;}
 	.linetabs #tabs li{font-size:1.3vw;}
 	.timevalue input[type=text]{width:4.0vw;}
+
+
     
 	
 }
