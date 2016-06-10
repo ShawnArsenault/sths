@@ -9,7 +9,7 @@ function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlay
 	var val = 0;
 	var vallast = 100000000;
 	var flag = false;
-
+	var typesplit = type.split("-");
 	if(type == 'Strat'){		
 		var fOF = document.getElementById(sid + 'OF').value;
 		var fDF = document.getElementById(sid + 'DF').value;
@@ -19,6 +19,11 @@ function valChange(field,type,sid,updown,BlockPlayerFromPlayingLines12,BlockPlay
 		
 		if(updown == 'up' && curtotal < maxmin && fieldvalue < maxmin){document.getElementById(field).value = curvalue;}
 		if(updown == 'down' && curtotal > maxmin && fieldvalue > maxmin){document.getElementById(field).value = curvalue;}
+	}else if(typesplit[0] == "Int"){
+		
+		maxmin = (updown == 'up') ? (typesplit[1]-1): 1;
+		if(!flag && updown == 'up' && curvalue <= maxmin){document.getElementById(field).value = curvalue;}
+		if(!flag && updown == 'down' && curvalue >= maxmin){document.getElementById(field).value = curvalue;}
 	}else{
 		if(sid == 'Line15vs5Forward' || sid == 'Line25vs5Forward' || sid == 'Line35vs5Forward' || sid == 'Line45vs5Forward'){
 			for(x=1;x<=4;x++){
@@ -224,6 +229,7 @@ function verifyStrat(){
 	ss.push('Line14VS4Forward','Line24VS4Forward','Line14VS4Defense','Line24VS4Defense');
 	ss.push('Line1PK4Forward','Line2PK4Forward','Line1PK4Defense','Line2PK4Defense');
 	ss.push('Line1PK3Forward','Line2PK3Forward','Line1PK3Defense','Line2PK3Defense');
+	ss.push('Strategy1','Strategy2','Strategy3','Strategy4','Strategy5');
 
 	var st = ['Line #1 5vs5 Forward','Line #2 5vs5 Forward','Line #3 5vs5 Forward','Line #4 5vs5 Forward'];
 	st.push('Line #1 5vs5 Defense','Line #2 5vs5 Defense','Line #3 5vs5 Defense','Line #4 5vs5 Defense');
@@ -231,6 +237,7 @@ function verifyStrat(){
 	st.push('Line #1 4VS4 Forward','Line #2 4VS4 Forward','Line #1 4VS4 Defense','Line #2 4VS4 Defense');
 	st.push('Line #1 PK4 Forward','Line #2 PK4 Forward','Line #1 PK4 Defense','Line #2 PK4 Defense');
 	st.push('Line #1 PK3 Forward','Line #2 PK3 Forward','Line #1 PK3 Defense','Line #2 PK3 Defense');
+	st.push('Winning(1)','Winning(2)','Equal','Losing(1)','Losing(2)');
 
 
 	for(x=0;x<ss.length;x++){

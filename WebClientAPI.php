@@ -543,6 +543,7 @@ function load_api_pageinfo(){
 			$fminfo = "";
 			$dbfields = api_get_fields($db,$customOTlines,$league);
 			$fmfields = array_merge($_POST["txtLine"],$_POST["txtStrategies"]);
+
 			$sql = "SELECT " . implode(" || ',' || ", $dbfields) . " AS LineValues FROM Team". $league ."Lines WHERE TeamNumber = " . $teamid . " AND Day = 1;";
 			$oRS = $db->query($sql);
 			$row = $oRS->fetchArray();
@@ -555,6 +556,7 @@ function load_api_pageinfo(){
 			if(trim($fminfo) != trim($dbinfo)){
 				$arrDB = explode(",",$dbinfo);
 				$arrFM = explode(",",$fminfo);
+				$dbfields = array_values($dbfields);
 				
 				// Need 2 running query strings: one for the regular lines table
 				// And one for the numberonly table.
@@ -719,7 +721,7 @@ function load_api_pageinfo(){
 												api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league);
 											}elseif($i == "Others"){?>
 												<?php // Start with the goalies. ?>
-												<div class="linesection <?= api_MakeCSSClass($i)?> goalies">
+												<div class="linesection id<?= api_MakeCSSClass($i)?> goalies">
 													<?php 
 														foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third String") AS $gid=>$g){?>
 															<h4><?= $g?></h4>
@@ -736,7 +738,7 @@ function load_api_pageinfo(){
 
 												// Make the extra forwards and extra defense.
 												foreach($field["start"] AS $fsid=>$fs){?>
-													<div class="linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>">
+													<div class="linesection id<?= api_MakeCSSClass($i)?> extra <?= $fs?>">
 														<h4>Extra <?= $fs?></h4>
 														<div class="blockcontainer">
 															<?php foreach($field["end"] AS $feid=>$fe){
@@ -755,7 +757,7 @@ function load_api_pageinfo(){
 													</div><!-- end linesection <?= api_MakeCSSClass($i)?> extra <?= $fs?>--><?php 
 												}?>
 												<?php // Make the penalty shots order?>
-												<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
+												<div class="linesection id<?= api_MakeCSSClass($i)?> penaltyshots">
 													<h4>Penalty Shots</h4>
 													<div class="blockcontainer">								
 														<div class="penaltyshot">
@@ -774,7 +776,7 @@ function load_api_pageinfo(){
 												<?php
 											}else if($i == "OT"){ 
 												foreach(array(10=>"Forward",5=>"Defense") AS $i=>$p){
-												?><div class="linesection ot ot<?= $p?>">
+												?><div class="linesection idot ot<?= $p?>">
 													<h4><?= $p?></h4>
 													<div class="blockcontainer">
 														<?php
@@ -793,11 +795,60 @@ function load_api_pageinfo(){
 
 												?></div><?php	
 												}
+											}else if($i == "Strategy"){?>
+													<h4>Team Wide Strategy</h4>
+													<div class="strategieswrapper linesection">
+														<?php
+															$text = "";
+															 for($x=1;$x<=5;$x++){
+															 	if($x == 1 || $x == 2){$text = "If winning by ";}
+															 	else if($x == 4 || $x == 5){
+															 		$text = "If losing by";}
+															 	else{$text = "If the score is equal  ";
+															 	}
+
+															 	?><div class="strategywrapper teamstrategy teamstrategy<?= $x; ?>">
+																	<div class="strategyamount">
+																		<?= $text ?> 
+																		<?php if($x != 3){?><?php api_make_strategies($row,"Strategy". $x,"GoalDiff","Int-10",$cpfields);?><?php } ?>
+																		then strategy is 
+																	</div>
+																	<div class="strategystrategies">
+																		<div class="">
+																			<div class="strategy">
+																				<?php foreach($strategy AS $sid=>$strat){?>
+																					<div class="strats">
+																						<div class="stratlabel"><?= $sid?> : </div>
+																						<div class="stratvalue">
+																							<?php api_make_strategies($row,"Strategy" .$x,$sid,"Strat",$cpfields);?>
+																						</div>
+																					</div>
+																				<?php }?>
+																			</div><!-- end strategy-->
+																		</div><!-- end strategywrapper-->
+																	</div>
+																</div><?php
+															 }
+														?>
+														<div class="strategywrapper PullGoalerMinGoal">
+															<div class="strategyamount">Goalie Minimum # of Goals before Remove from Game</div>
+															<div class="strategystrategies"><?php api_make_strategies($row,"PullGoaler","MinGoal","Int-10",$cpfields);?></div>
+														</div>
+														<div class="strategywrapper PullGoalerMinPct">
+															<div class="strategyamount">Goalie Save PCT Under before Remove from Game</div>
+															<div class="strategystrategies"><?php api_make_strategies($row,"PullGoaler","MinPct","Int-100",$cpfields);?></div>
+														</div>
+														<div class="strategywrapper RemoveGoalieSecond">
+															<div class="strategyamount">When to remove the goalies from goal if trailing by 1 in the third period (in seconds)</div>
+															<div class="strategystrategies"><?php api_make_strategies($row,"Remove","GoaliesSecond","Int-180",$cpfields);?></div>
+														</div>
+													</div>
+												<?php
 											}else{
 												// Make the Offsensive and Defensive Lines.
 												$types = array("Off"=>"Offensive Line","Def"=>"Defensive Line");
 												foreach($types AS $tid=>$t){?>
-													<div class="linesection <?= api_MakeCSSClass($i)?> penaltyshots">
+													<div class="linesection id<?= api_MakeCSSClass($i)?> penaltyshots">
 														<h4><?= $t?></h4>
 														<div class="blockcontainer"><?php 
 															$fordef = array("Forward", "Defense");
@@ -818,8 +869,8 @@ function load_api_pageinfo(){
 														</div><!-- end blockcontainer-->
 													</div><!-- end linesection <?= api_MakeCSSClass($i)?> penaltyshots--><?php 
 												}
-											}
-										?></div><!-- end tabs-<?= $count ?>--><?php 
+											}?>
+										</div><!-- end tabs-<?= $count ?>--><?php 
 									}
 								}?>
 							</form>
@@ -832,7 +883,7 @@ function load_api_pageinfo(){
 	function api_make_blocks($row,$blocks,$positions,$strategy,$i,$availableplayers,$cpfields,$league){
 		$bcount = 0;
 		foreach($blocks[$i] AS $bid=>$block){?>
-			<div class="linesection <?= api_MakeCSSClass($i)?> <?= api_MakeCSSClass($bid)?>">
+			<div class="linesection id<?= api_MakeCSSClass($i)?> id<?= api_MakeCSSClass($bid)?>">
 				<h4><?= $block ?></h4>
 				<div class="blockcontainer">
 					<div class="positionwrapper">
@@ -876,7 +927,7 @@ function load_api_pageinfo(){
 									<div class="strats">
 										<div class="stratlabel"><?= $sid?> : </div>
 										<div class="stratvalue">
-											<?php api_make_strategies($row,$field,$sid,true,$cpfields);?>
+											<?php api_make_strategies($row,$field,$sid,"Strat",$cpfields);?>
 										</div>
 									</div>
 								<?php }?>
@@ -884,9 +935,9 @@ function load_api_pageinfo(){
 						</div><!-- end strategywrapper-->
 						<div class="timewrapper">
 							<div class="time">
-								<div class="timelabel">Time % : </div>
+								<div class="timelabel">Time%: </div>
 								<div class="timevalue">
-									<?php api_make_strategies($row,$field,"Time",false,$cpfields);?>
+									<?php api_make_strategies($row,$field,"Time","Time",$cpfields);?>
 								</div>
 							</div>
 						</div><!-- end timerwrapper-->
@@ -895,13 +946,20 @@ function load_api_pageinfo(){
 			</div><!-- end linesection <?= api_MakeCSSClass($i)?> <?= api_MakeCSSClass($bid)?>--><?php 
 		}
 	}
-	function api_make_strategies($row,$field,$sid,$strat=true,$cpfields=""){?>
-		<?php $use = ($strat) ? "Strat" : "Time";?>
-		<?php $id = $field . $sid; ?>
-		<input class="updown down" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="&#160;">
-		<input readonly size="1" id="<?= $id?>" class="stratval" type="text" name="txtStrategies[<?= $id ?>]" value="<?= $row[$id] ?>">
-		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $use ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="&#160;">
-		<?php 
+	function api_make_strategies($row,$field,$sid,$strat="Strat",$cpfields=""){
+		$id = $field . $sid; 
+		$size = 0;
+		if($strat == "Strat"){$size = 1;}
+		elseif($strat == "Time"){$size=3;}
+		else{
+			$exp = explode("-",$strat);
+			if($exp[1] <= 10){$size = 2;}
+			else{$size = 3;}
+		}
+		?>
+		<input class="updown down" onclick="valChange('<?= $id ?>','<?= $strat ?>','<?=$field?>','down',<?=$cpfields?>);" type="button" name="btnDown" value="&#160;">
+		<input readonly size="<?= $size ?>" id="<?= $id?>" class="stratval" type="text" name="txtStrategies[<?= $id ?>]" value="<?= $row[$id] ?>">
+		<input class="updown up" onclick="valChange('<?= $id ?>','<?= $strat ?>','<?=$field?>','up',<?=$cpfields?>);" type="button" name="btnUp" value="&#160;"><?php 
 	}
 	function api_get_fields($db,$customOTlines,$league){
 		// Make an array of field names in the DB.
@@ -919,7 +977,7 @@ function load_api_pageinfo(){
 	}
 	function api_get_line_arrays($type="blocks"){
 		// This returns an array of needed information.
-		$arr["tabs"] = array("Forward"=>"Forward","Defense"=>"Defense","PP"=>"PP","4VS4"=>"4vs4","PK4"=>"PK4","PK3"=>"PK3","Others"=>"Others","LastMin"=>"Last Min","OT"=>"Overtime");
+		$arr["tabs"] = array("Forward"=>"Forward","Defense"=>"Defense","PP"=>"PP","4VS4"=>"4vs4","PK4"=>"PK4","PK3"=>"PK3","Others"=>"Others","LastMin"=>"Last Min","OT"=>"Overtime","Strategy"=>"Strategy");
 		$arr["blocks"]["Forward"] = array("line1"=>"Lines #1","line2"=>"Lines #2","line3"=>"Lines #3","line4"=>"Lines #4");
 		$arr["blocks"]["Defense"] = array("pair1"=>"Pair #1","pair2"=>"Pair #2","pair3"=>"Pair #3","pair4"=>"Pair #4");
 		$arr["blocks"]["PP"] = array("ppline1"=>"PP Lines #1","ppline2"=>"PP Lines #2","pppair1"=>"PP Pair #1","pppair2"=>"PP Pair #2");
@@ -932,6 +990,7 @@ function load_api_pageinfo(){
 		$arr["positions"]["Forward3"] = array("Center"=>"F");
 		$arr["positions"]["Forward4"] = array("Center"=>"C","Wing"=>"W");
 		$arr["positions"]["Defense"] = array("Defense1"=>"LD","Defense2"=>"RD");
+		
 		$arr["strategy"] = array("Phy"=>"Phy","DF"=>"DF","OF"=>"OF");
 
 		$arr["otherfield"]["start"] = array("Forward"=>"Forwards","Defense"=>"Defensemen");
