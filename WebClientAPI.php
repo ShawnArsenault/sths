@@ -401,6 +401,12 @@ function load_api_pageinfo(){
 								// If the player is a goalie, add 10000 to the PLayer Number
 								// This takes into account ID numbers can be duplicated in the PlayerInfo and GoalerInfo tables
 								if($row["PositionString"] == "G"){$row["Number"]+=10000;}
+								// Do not allow players without contracts to be dressed.
+								if($row["Contract"] == 0){
+									$row["Injury"] = "No Contract";
+									// Make them Pro Scratched or Farm Scratched.
+									$row["Status".$s] = ($row["Status".$s] == 3) ? 2 : 0;
+								}
 								$status[$s][$row["Status".$s]][$row["Number"]]["Number"] = $row["Number"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Name"] = $row["Name"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Injury"] = $row["Injury"];
