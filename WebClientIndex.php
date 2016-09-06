@@ -7,7 +7,6 @@
 <br />
 <div style="width:95%;margin:auto;">
 <table class="tablesorter STHSPHPWebClient_Table">
-<thead><tr><th style="width:400px;">Team</th><th style="width:100px;">Roster</th><th style="width:100px;">Pro Lines</th><th  style="width:100px;">Farm Lines</th></tr></thead><tbody>
 <?php
 include "STHSSetting.php";
 //  Get STHS Setting $Database Value
@@ -19,11 +18,20 @@ $Query = "SELECT Number, Name FROM TeamProInfo ORDER BY Name";
 $Team = $db->query($Query);
 // Query Database for Team Name
 
+$Query = "Select FarmEnable from LeagueSimulation";
+$LeagueSimulationMenu = $db->querySingle($Query,true);	
+// Query Database to Confirm Farm is Enable
+
+echo "<thead><tr><th style=\"width:400px;\">Team</th><th style=\"width:100px;\">Roster</th><th style=\"width:100px;\">Pro Lines</th>";
+If ($LeagueSimulationMenu['FarmEnable'] == "True"){echo "<th style=\"width:100px;\">Farm Lines</th>";}
+echo "</tr></thead><tbody>";
+
 if (empty($Team) == false){while ($row = $Team ->fetchArray()) { 
 	echo "<tr><td>" . $row['Name'] . "</td>\n";
 	echo "<td style=\"text-align:center\";><a href=\"WebClientRoster.php?TeamID=" . $row['Number'] . "\">Edit</a></td>\n"; 
 	echo "<td style=\"text-align:center\";><a href=\"WebClientLines.php?League=Pro&TeamID=" . $row['Number'] . "\">Edit</a></td>\n"; 
-	echo "<td style=\"text-align:center\";><a href=\"WebClientLines.php?League=Farm&TeamID=" . $row['Number'] . "\">Edit</a></td></tr>\n"; 
+	If ($LeagueSimulationMenu['FarmEnable'] == "True"){echo "<td style=\"text-align:center\";><a href=\"WebClientLines.php?League=Farm&TeamID=" . $row['Number'] . "\">Edit</a></td>\n";}
+	echo "</tr>";
 }}
 ?>
 

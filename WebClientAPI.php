@@ -519,7 +519,7 @@ function load_api_pageinfo(){
 			</div>
 		</div><!-- End #rostereditor->$id --><?php
 	}
-	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true,$showHeader=true){
+	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showDropdown=true,$showHeader=true,$useServerURIInTabLink=false){
 		// $db = sqlite DB
 		// $teamid is a teamid to use that teams roster.
 		// $league is "Pro" or "Farm" based on selection.
@@ -714,13 +714,16 @@ function load_api_pageinfo(){
 							<ul class="positiontabs">
 								<?php  // loop through the tab names creating clickable tabs. ?>
 								<?php  
+								$tablink = ($useServerURIInTabLink) ? $_SERVER["REQUEST_URI"] . "#tabs-" : "#tabs-";
 								foreach($tabs AS $i=>$t){
 									$displaytab = false;
 									if($i != "OT"){$displaytab = true;
 									}elseif($i == "OT" && $customOTlines){$displaytab = true;
 									}else{$displaytab = false;
 									}
-									if($displaytab){?><li class="tabitem"><a href="#tabs-<?= ++$count?>"><?= $t?></a></li><?php }
+									if($displaytab){?>
+										<li class="tabitem"><a href="<?= $tablink . ++$count?>"><?= $t?></a></li><?php 
+									}
 								}?>	
 							</ul>
 							<?php $count = 0;?>
