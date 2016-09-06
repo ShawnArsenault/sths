@@ -82,6 +82,6 @@ $(function() {
 
 $(function() {
   $( "#tabs" ).tabs();
-  $( "#tabs1" ).tabs();
-  $( "#tabs2" ).tabs();
+  //$( "#tabs1" ).tabs();
+  //$( "#tabs2" ).tabs();
 });
