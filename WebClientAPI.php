@@ -360,7 +360,6 @@ function load_api_pageinfo(){
 							} // End foreach $player
 						}// End foreach $arrSort
 						//Update the database and save the lines.
-						echo $sql;
 						$db->exec("pragma journal_mode=memory;");
 						$db->exec($sql);
 						$confirmbannertext = "Roster has been saved."; 
