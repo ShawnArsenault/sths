@@ -82,9 +82,4 @@ $(function() {
 
 $(function() {
   $( "#tabs" ).tabs();
-<<<<<<< HEAD
-  //$( "#tabs1" ).tabs();
-  //$( "#tabs2" ).tabs();
-=======
->>>>>>> origin/master
 });
