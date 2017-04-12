@@ -1,4 +1,6 @@
 <?php
+	session_start();
+	mb_internal_encoding("UTF-8");
 	require_once("STHSSetting.php");
 	//  Get STHS Setting $Database Value	
 
@@ -16,15 +18,27 @@
 	
 	// Look for a team ID in the URL, if non exists use 0
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
-
+	if($t > 0){
+		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
+		$row = $rs->fetchArray();
+	}
 	// Make a default header 
 	// 5 Paramaters. PageID, database, teamid, League = Pro/Farm, $headcode (custom headercode can be added. DEFAULT "")
-	api_layout_header("rostereditor",$db,$t,false,$WebClientHeadCode);
+	api_layout_header("rostereditor",$db,$t,$l,$WebClientHeadCode);
+	api_alpha_testing();
+	api_html_form_teamid($db,$t);
+	api_security_logout();
+	api_security_authenticate($_POST,$row);
+
+	if(api_security_access($row)){
+		// Display the roster editor page using API.
+		// use 3 paramaters Database, TeamID, showH1Tag (DEFAULT true/false)   
+		api_pageinfo_editor_roster($db,$t);
+	}else{
+		api_html_login_form($row);
+	}
 
 
-	// Display the roster editor page using API.
-	// use 4 paramaters Database, TeamID, showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
-	api_pageinfo_editor_roster($db,$t);
 
 	// Close the db connection
 	$db->close();

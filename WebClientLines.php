@@ -1,4 +1,6 @@
 <?php
+	session_start();
+	mb_internal_encoding("UTF-8");
 	include "STHSSetting.php";
 	//  Get STHS Setting $Database Value
 
@@ -18,12 +20,26 @@
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
 
+	if($t > 0){
+		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
+		$row = $rs->fetchArray();
+	}
+
 	// Make a default header 
 	api_layout_header("lineeditor",$db,$t,$l,$WebClientHeadCode);
+	api_alpha_testing();
+	api_html_form_teamid($db,$t,true);
+	api_security_logout();
+	api_security_authenticate($_POST,$row);
+	
 
-	// Display the line editor page using API.
-	// use 5 paramaters Database, TeamID, $league("Pro","Farm"), showTeamDropdown (DEFAULT true/false), showH1Tag (DEFAULT true/false)   
-	api_pageinfo_editor_lines($db,$t,$l);
+	if(api_security_access($row)){
+		// Display the line editor page using API.
+		// use 4 paramaters Database, TeamID, $league("Pro","Farm"), showH1Tag (DEFAULT true/false)   
+		api_pageinfo_editor_lines($db,$t,$l);
+	}else{
+		api_html_login_form($row);
+	}
 
 	// Close the db connection
 	$db->close();
