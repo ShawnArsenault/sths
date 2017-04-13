@@ -23,6 +23,8 @@
 	if($t > 0){
 		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
 		$row = $rs->fetchArray();
+	}else{
+		$row = array();
 	}
 
 	// Make a default header 

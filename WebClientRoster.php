@@ -21,10 +21,12 @@
 	if($t > 0){
 		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
 		$row = $rs->fetchArray();
+	}else{
+		$row = array();
 	}
 	// Make a default header 
 	// 5 Paramaters. PageID, database, teamid, League = Pro/Farm, $headcode (custom headercode can be added. DEFAULT "")
-	api_layout_header("rostereditor",$db,$t,$l,$WebClientHeadCode);
+	api_layout_header("rostereditor",$db,$t,false,$WebClientHeadCode);
 	api_alpha_testing();
 	api_html_form_teamid($db,$t);
 	api_security_logout();

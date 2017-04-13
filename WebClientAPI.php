@@ -165,7 +165,7 @@ function load_api_jquery(){
 		$(function() {
 		    $("#sortProDress, #sortProScratch, #sortFarmDress, #sortFarmScratch").sortable({
 	        	items: ".playerrow",
-	         	items: "li:not(.notmovable)",
+	         	items: "li:not(.sticky)",
 	        	forcePlaceholderSize: true,
 	        	connectWith: ".connectedSortable",
 	        	update: function(event, ui) {<?= $jsfunction ?>}
@@ -448,6 +448,7 @@ function load_api_pageinfo(){
 								$status[$s][$row["Status".$s]][$row["Number"]]["ForceWaiver"] = $row["ForceWaiver"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Condition"] = $row["Condition"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Contract"] = $row["Contract"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Suspension"] = $row["Suspension"];
 							} // End for loop for statuses
 						} // End while loop for players in result.
 						
@@ -517,7 +518,7 @@ function load_api_pageinfo(){
 																	// to the <li> which will not allow him to be part of the JQuery drag and drop
 																	// therefore unmovable. 
 																	
-																	$stick = ($s["Condition"] < 96 || $s["Contract"] == 0) ? " notmovable": "";
+																	$stick = ($s["Condition"] < 96 || $s["Contract"] == 0) ? " sticky": "";
 																	$inj = ($s["Condition"] < 96) ? " injury": "";
 																	$noc = ($s["Contract"] == 0) ? " nocontract": "";
 																	
@@ -585,12 +586,14 @@ function load_api_pageinfo(){
 			$oRS = $db->query($sql);
 			$row = $oRS->fetchArray();
 			$customOTlines = ($row["CustomLines"] == "True") ? true: false;
+			$cpfieldsOTLines = ($customOTlines) ? 'true': 'false';
 
 			// get the fields needed for the ChangePlayer function onClick
 			$dbfields = api_dbresult_line_editor_fields($db);
 			$cpfields = "";
 			foreach($dbfields AS $f){$cpfields .= strtolower($f) .",";}
-			$cpfields = rtrim($cpfields,",");
+			$cpfields .= $cpfieldsOTLines;
+			//$cpfields = rtrim($cpfields,",");
 		}// end if $teamid
 
 		
@@ -1470,10 +1473,19 @@ function load_api_security(){
 		}
 	}
 	function api_security_access($row){
-		return ($row["WebPassword"] == "" || api_security_isLogged($row["Number"])) ? true : false;
+		if(empty($row)){
+			return true;
+		}else{
+			return (array_key_exists("WebPassword", $row) && $row["WebPassword"] == "" || array_key_exists("Number", $row) && api_security_isLogged($row["Number"])) ? true : false;
+		}
+		
 	}
 	function api_security_isLogged($teamid){
-		return $_SESSION["STHSWebClient"]["TeamID"][$teamid];
+		if(array_key_exists("STHSWebClient", $_SESSION)){
+			return $_SESSION["STHSWebClient"]["TeamID"][$teamid];
+		}else{
+			return false;
+		}
 	}
 }
 ?>
