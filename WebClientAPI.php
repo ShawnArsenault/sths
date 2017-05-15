@@ -394,6 +394,7 @@ function load_api_pageinfo(){
 							} // End foreach $player
 						}// End foreach $arrSort
 						//Update the database and save the lines.
+						$db->busyTimeout(5000);
 						$db->exec("pragma journal_mode=memory;");
 						$db->exec($sql);
 						$confirmbannertext = "Roster has been saved."; 
@@ -552,7 +553,8 @@ function load_api_pageinfo(){
 			</div><!-- end pagewrapper -->
 		</div><!-- end id rostereditor --><?php
 	}
-	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showHeader=true,$useServerURIInTabLink=false){		
+	function api_pageinfo_editor_lines($db,$teamid=0,$league=false,$showHeader=true,$useServerURIInTabLink=false){	
+
 		// $db = sqlite DB
 		// $teamid is a teamid to use that teams roster.
 		// $league is "Pro" or "Farm" based on selection.
@@ -597,7 +599,7 @@ function load_api_pageinfo(){
 		}// end if $teamid
 
 		
-		
+	
 		// If the updatelines submit button is clicked 
 		if(isset($_POST["sbtUpdateLines"])){
 			$fminfo = "";
@@ -643,6 +645,7 @@ function load_api_pageinfo(){
 
 				$sql .= " WHERE TeamNumber = " . $teamid . ";";
 				$sqlno .= " WHERE TeamNumber = " . $teamid . ";";
+				$db->busyTimeout(5000);
 				$db->exec("pragma journal_mode=memory;");
 				$db->exec($sql);
 				$db->exec($sqlno);	
@@ -664,7 +667,7 @@ function load_api_pageinfo(){
 						<h1><?= $teamname ?>Line Editor</h1>
 						<?php
 					}
-					if(isset($_REQUEST["TeamID"])){?>
+					if(isset($teamid)){?>
 						<form id="submissionform" name="frmEditLines" method="POST" onload="checkCompleteLines();">
 							<?php
 								$buttontext = (api_has_saved_lines($db,$teamid,$league)) ? "Re-Save Lines" : "Save Lines";
