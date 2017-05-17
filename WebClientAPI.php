@@ -438,7 +438,12 @@ function load_api_pageinfo(){
 									// Make them Pro Scratched or Farm Scratched.
 									$row["Status".$s] = ($row["Status".$s] == 3 || $row["Status".$s] == 2) ? 2 : 0;
 								}
-
+								if($row["Condition"] <= 95 && $row["Status".$s] == 3){
+									$row["Status".$s] = 2;
+								}
+								if($row["Condition"] <= 95 && $row["Status".$s] == 1){
+									$row["Status".$s] = 0;
+								}
 								$status[$s][$row["Status".$s]][$row["Number"]]["Number"] = $row["Number"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Name"] = $row["Name"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Injury"] = $row["Injury"];
