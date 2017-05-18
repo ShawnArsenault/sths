@@ -158,7 +158,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		if(proDress[3][g] < ProMinD){errorText += '<div class="erroritem errorposition notproposition">Pro D:  ' + proDress[3][g] + ' dressed, ' + ProMinD + ' required.</div>';}
 		if(proDress[4][g] < ProGoalerInGame){errorText += '<div class="erroritem errorposition notproposition">Pro G:  ' + proDress[4][g] + ' dressed, ' + ProGoalerInGame + ' required.</div>';}
 		if(proDress[5][g] < ProMinForward){errorText += '<div class="erroritem errorposition notproposition">Pro Fwd:  ' + proDress[5][g] + ' dressed, ' + ProMinForward + ' required.</div>';}
-		if(pro[5][g] + pro[3][g] + pro[4][g] > ProPlayerLimit){errorText += '<div class="erroritem playercount limitprodressed">Too many Pro players.</div>';}
+		if(pro[5][g] + pro[3][g] > ProPlayerLimit){errorText += '<div class="erroritem playercount limitprodressed">Too many Pro players.</div>';}
 		if(FullFarmEnable){
 			if(farmDress[0][g] < FarmMinC){errorText += '<div class="erroritem errorposition notfarmposition">Farm C:  ' + farmDress[0][g] + ' dressed, ' + FarmMinC + ' required.</div>';}
 			if(farmDress[1][g] < FarmMinLW){errorText += '<div class="erroritem errorposition notfarmposition">Farm LW:  ' + farmDress[1][g] + ' dressed, ' + FarmMinLW + ' required.</div>';}
@@ -166,7 +166,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 			if(farmDress[5][g] < FarmMinForward){errorText += '<div class="erroritem errorposition notfarmposition">Farm Fwd:  ' + farmDress[5][g] + ' dressed, ' + FarmMinForward + ' required.</div>';}
 			if(farmDress[3][g] < FarmMinD){errorText += '<div class="erroritem errorposition notfarmposition">Farm D:  ' + farmDress[3][g] + ' dressed, ' + FarmMinD + ' required.</div>';}
 			if(farmDress[4][g] < FarmGoalerInGame){errorText += '<div class="erroritem errorposition notfarmposition">Farm G:  ' + farmDress[4][g] + ' dressed, ' + FarmGoalerInGame + ' required.</div>';}
-			if(farm[5][g] + farm[3][g] + farm[4][g] > FarmPlayerLimit){errorText += '<div class="erroritem playercount limitfarmdressed">Too many farm players.</div>';}
+			if(farm[5][g] + farm[3][g] > FarmPlayerLimit){errorText += '<div class="erroritem playercount limitfarmdressed">Too many farm players.</div>';}
 		}
 		if(playerCount > MaximumPlayerPerTeam){errorText += '<div class="erroritem playercount toomanyplayers">Too many players on your roster.</div>';}
 		if(playerCount < MinimumPlayerPerTeam){errorText += '<div class="erroritem playercount notenoughplayers">Not enough players on your roster.</div>';}

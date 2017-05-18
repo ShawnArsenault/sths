@@ -523,15 +523,15 @@ function load_api_pageinfo(){
 																	// Checks to see if a player is injured or has 0 contract. if so, it will add an injury or nocontract class
 																	// to the <li> which will not allow him to be part of the JQuery drag and drop
 																	// therefore unmovable. 
-																	
-																	$stick = ($s["Condition"] < 96 || $s["Contract"] == 0) ? " sticky": "";
+																	$stick = ($s["Condition"] < 96 || $s["Contract"] == 0 || $s["Suspension"]  > 0) ? " sticky": "";
 																	$inj = ($s["Condition"] < 96) ? " injury": "";
 																	$noc = ($s["Contract"] == 0) ? " nocontract": "";
+																	$sus = ($s["Suspension"]  > 0) ? " suspension": "";
 																	
 																	// playerrow class is the class JQuery is looking for to allow the drag and drop process
 																	// if an <li> field has this, it can potentially be moved up and down the column.
 																	?>
-																	<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?>" class="playerrow <?= $columnid . $stick . $inj . $noc; ?>">
+																	<li id="line<?=$nextgame . "_" . api_MakeCSSClass($s["Name"])?>" class="playerrow <?= $columnid . $stick . $inj . $noc . $sus; ?>">
 																		<div class="rowinfo">
 																			<?php 
 																			// Use a hidden field in the form to get the info to save to the SQLite DB.
@@ -1489,7 +1489,7 @@ function load_api_security(){
 		
 	}
 	function api_security_isLogged($teamid){
-		if(array_key_exists("STHSWebClient", $_SESSION)){
+		if(array_key_exists("STHSWebClient", $_SESSION) && isset($_SESSION["STHSWebClient"]["TeamID"][$teamid])){
 			return $_SESSION["STHSWebClient"]["TeamID"][$teamid];
 		}else{
 			return false;

@@ -29,6 +29,7 @@
 #rostereditor .rowinfoline{float:left;margin-left:5px;}
 
 #rostereditor .injury{background-color:#f2dede !important;}
+#rostereditor .suspension{background-color:#f5dede !important;}
 #rostereditor .ProScratch.nocontract{color:#cccccc !important;}
 #rostereditor .FarmScratch.nocontract{color:#666666 !important;}
 
