@@ -187,10 +187,8 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 			displayErrors += 		errorText;
 			displayErrors += "</div>";
 
-			errorElement.innerHTML = waiverText + displayErrors;
-			
+			errorElement.innerHTML = waiverText + displayErrors;	
 		}
-
 	}	
 
 	// Check to see if the flag is on for forcing all lines completed before saving.

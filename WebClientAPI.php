@@ -1486,7 +1486,6 @@ function load_api_security(){
 		}else{
 			return (array_key_exists("WebPassword", $row) && $row["WebPassword"] == "" || array_key_exists("Number", $row) && api_security_isLogged($row["Number"])) ? true : false;
 		}
-		
 	}
 	function api_security_isLogged($teamid){
 		if(array_key_exists("STHSWebClient", $_SESSION) && isset($_SESSION["STHSWebClient"]["TeamID"][$teamid])){
