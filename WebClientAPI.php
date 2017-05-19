@@ -65,7 +65,7 @@ function load_api_fields(){
 	function api_fields_roster_editor_setup(){
 		return  array(	"MaximumPlayerPerTeam","MinimumPlayerPerTeam","isWaivers","BlockSenttoFarmAfterTradeDeadline","isAfterTradeDeadline","ProTeamEliminatedCannotSendPlayerstoFarm","isEliminated","ForceCorrect10LinesupbeforeSaving",
 						"ProMinC","ProMinLW","ProMinRW","ProMinD","ProMinForward","ProGoalerInGame","ProPlayerInGame","ProPlayerLimit", 
-						"FarmMinC","FarmMinLW","FarmMinRW","FarmMinD","FarmMinForward","FarmGoalerInGame","FarmPlayerInGame","FarmPlayerLimit","MaxFarmOv","MaxFarmOvGoaler","GamesLeft","FullFarmEnable");
+						"FarmMinC","FarmMinLW","FarmMinRW","FarmMinD","FarmMinForward","FarmGoalerInGame","FarmPlayerInGame","FarmPlayerLimit","MaxFarmOv","MaxFarmOvGoaler","GamesLeft","FullFarmEnable","MaxFarmSalary");
 	}
 	// Return all the fields needed for the line editor.
 	function api_fields_line_editor_setup(){
@@ -84,7 +84,8 @@ function load_api_fields(){
 		$value .= api_MakeCSSClass($row["Name"]) . "|";
 		$value .= ($row["Injury"] == "" && $row["Suspension"] == 0) ? "false" . "|": "true" . "|";
 		$value .= $row["Condition"] . "|";
-		$value .= $row["Contract"];
+		$value .= $row["Contract"]. "|";
+		$value .= $row["Salary1"];
 
 		return $value;
 	}
@@ -455,6 +456,7 @@ function load_api_pageinfo(){
 								$status[$s][$row["Status".$s]][$row["Number"]]["Condition"] = $row["Condition"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Contract"] = $row["Contract"];
 								$status[$s][$row["Status".$s]][$row["Number"]]["Suspension"] = $row["Suspension"];
+								$status[$s][$row["Status".$s]][$row["Number"]]["Salary1"] = $row["Salary1"];
 							} // End for loop for statuses
 						} // End while loop for players in result.
 						
@@ -1344,6 +1346,8 @@ function load_api_sql(){
 				$sql .= "(CASE WHEN (SELECT COUNT(GameNumber) FROM SchedulePro WHERE VisitorTeam = ". $teamid ." AND Play = 'False' OR HomeTeam = ". $teamid ." AND Play = 'False') > 0 THEN 10 WHEN (SELECT COUNT(GameNumber) FROM SchedulePro WHERE VisitorTeam = ". $teamid ." AND Play = 'False' OR HomeTeam = ". $teamid ." AND Play = 'False') < 1 THEN 1 ELSE (SELECT COUNT(GameNumber) FROM SchedulePro WHERE VisitorTeam = ". $teamid ." AND Play = 'False' OR HomeTeam = ". $teamid ." AND Play = 'False') END) AS ". $f .",";
 			}elseif($f == "FullFarmEnable"){
 				$sql .= "(SELECT FullFarmEnable FROM LeagueSimulation) AS ". $f .",";
+			}elseif($f == "MaxFarmSalary"){
+				$sql .= "(SELECT PlayerFarmMaxSalary FROM LeagueFinance) AS ". $f .",";
 			}else{
 				$sql .= $f . ",";
 			}

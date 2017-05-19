@@ -1,8 +1,8 @@
 function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,BlockSenttoFarmAfterTradeDeadline,isPastTradeDeadline,ProTeamEliminatedCannotSendPlayerstoFarm,isEliminated,ForceCorrect10LinesupbeforeSaving,
 							ProMinC,ProMinLW,ProMinRW,ProMinD,ProMinForward,ProGoalerInGame,ProPlayerInGame,ProPlayerLimit,
-							FarmMinC,FarmMinLW,FarmMinRW,FarmMinD,FarmMinForward,FarmGoalerInGame,FarmPlayerInGame,FarmPlayerLimit,MaxFarmOv,MaxFarmOvGoaler,GamesLeft,FullFarmEnable){
+							FarmMinC,FarmMinLW,FarmMinRW,FarmMinD,FarmMinForward,FarmGoalerInGame,FarmPlayerInGame,FarmPlayerLimit,MaxFarmOv,MaxFarmOvGoaler,GamesLeft,FullFarmEnable,MaxFarmSalary){
 	// Declare variables needed inside the loop. Set to Null
-	var explode, status, proPlayerLimit, farmPlayerLimit, playerProToFarmTradeDeadline, playerProToFarmEliminated, playerProToFarmOverall;
+	var explode, status, proPlayerLimit, farmPlayerLimit, playerProToFarmTradeDeadline, playerProToFarmEliminated, playerProToFarmOverall, playerProToFarmSalary;
 
 	// Declare variables with a default value of empty text or 0
 	var playerCount = 0, waiverCount = 0;
@@ -47,12 +47,12 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		playerProToFarmTradeDeadline = 0;
 		playerProToFarmEliminated = 0;
 		playerProToFarmOverall = 0;
-
+		playerProToFarmSalary = 0;
 
 		// Loop through each player
 		for (x = 0; x < players.length; x++) {
 			// Split the value at the pipe "|" and use each section for checking.
-			//Anthony Marchant|571|1|C|3|80|true|anthonymarchant|false|100|2
+			//Anthony Marchant|571|1|C|3|80|true|anthonymarchant|false|100|2|1999000
 			// 0 = Name
 			// 1 = Number
 			// 2 = Position Number
@@ -64,6 +64,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 			// 8 = Injure/Suspension
 			// 9 = Condition
 			//10 = Contract
+			//11 = Salary1
 		    explode = players[x].value.split("|");
 		    // If the explode array only has 2 sections then its a change in which status we are going through.
 		    if(explode.length == 2){
@@ -117,6 +118,10 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		    	// Check for Overall to see if their overall is allowed in the farm
 		    	if(status <= 1 && explode[2] != 16 && explode[5] > MaxFarmOv || status <= 1 && explode[2] == 16 && explode[5] > MaxFarmOvGoaler){
 		    		playerProToFarmOverall++;
+		    	}
+		    	// Check for Salary to see if their Salary is allowed in the farm
+		    	if(status <= 1 && explode[11] > MaxFarmSalary){
+		    		playerProToFarmSalary++;
 		    	}
 		    }
 		}
@@ -173,6 +178,8 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		if(playerProToFarmTradeDeadline > 0){errorText += '<div class="erroritem farmmove tradedeadline">Cannot send ' + playerProToFarmTradeDeadline + ' players to the farm. (After Trade Deadline).</div>';}
 		if(playerProToFarmEliminated > 0){errorText += '<div class="erroritem farmmove eliminated">Cannot send ' + playerProToFarmEliminated + ' players to the farm. (Eliminated From Playoffs).</div>';}
 		if(playerProToFarmOverall > 0){errorText += '<div class="erroritem farmmove overall">Cannot send ' + playerProToFarmOverall + ' players to the farm. (Farm Overall Limit).</div>';}
+		if(playerProToFarmSalary > 0){errorText += '<div class="erroritem farmmove salary">Cannot send ' + playerProToFarmSalary + ' players to the farm. (Farm Salary Limit).</div>';}
+
 		// If the error text is empty still then the roster is complete and display
 		if(errorText == ''){
 			errorElement.innerHTML = waiverText + '<div class="rostercomplete">Roster is complete.</div>';
