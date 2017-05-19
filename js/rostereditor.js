@@ -92,37 +92,43 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 	    			}
 		    	}
 
+		    	var elem = document.getElementById('line1_'+explode[7]);
 	    		// If flagged properly and trying to send to farm, not allowed if sending player to the farm after trade deadline 
 	    		if(BlockSenttoFarmAfterTradeDeadline == "true" && isPastTradeDeadline == "true" && explode[4] >= 2 && status <= 1){playerProToFarmTradeDeadline++;}
 	    		// If flagged properly and trying to send to farm, not allowed if sending player to the farm if eliminated from the playoffs
 	    		if(ProTeamEliminatedCannotSendPlayerstoFarm == "true" && isEliminated == "true" && explode[4] >= 2 && status <= 1){playerProToFarmEliminated++;}
+	    		// Check for Overall to see if their overall is allowed in the farm
+		    	if(status <= 1 && explode[2] != 16 && explode[5] > MaxFarmOv || status <= 1 && explode[2] == 16 && explode[5] > MaxFarmOvGoaler){
+		    		if(elem.className.match(/\bprotofarmov\b/)){var me;}else{elem.className = elem.className + " protofarmov";} 
+		    		playerProToFarmOverall++;
+		    	}
+		    	// Check for Salary to see if their Salary is allowed in the farm
+		    	if(status <= 1 && explode[11] > MaxFarmSalary){
+		    		if(elem.className.match(/\bprotofarmsalary\b/)){var me;}else{elem.className = elem.className + " protofarmsalary";} 	
+		    		playerProToFarmSalary++;
+		    	}
 	    		// If flagged properly and player is forced to waivers set up waiver info. Can only do this on Game 1
 	    		if(isWaivers == true && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
-	    			var elem = document.getElementById('line1_'+explode[7]);
 	    			// Add the movetowaiver class to the li
 	    			if(elem.className.match(/\bmovetowaiver\b/)){var me;}else{elem.className = elem.className + " movetowaiver";} 					
 					// Remove the li from where it was dropped and tag it to the bottom of the scratch list
 					elem.parentNode.removeChild(elem);
 					var scratchlist = document.getElementsByClassName("sortFarmScratch1");
 					scratchlist[0].appendChild(elem); 
-	    		}else{
-		    		if (g == 1 && status >= 2){
-		    			// If moving the player back up to the pros, remove the movetowaiver class.
-		    			var elemLine = 'line1_' + explode[7];
-		    			var elem = document.getElementById(elemLine);
-		    			elem.className = elem.className.replace(" movetowaiver","");
-		    		}
-		    		
-		    	}
+	    		}
 
-		    	// Check for Overall to see if their overall is allowed in the farm
-		    	if(status <= 1 && explode[2] != 16 && explode[5] > MaxFarmOv || status <= 1 && explode[2] == 16 && explode[5] > MaxFarmOvGoaler){
-		    		playerProToFarmOverall++;
-		    	}
-		    	// Check for Salary to see if their Salary is allowed in the farm
-		    	if(status <= 1 && explode[11] > MaxFarmSalary){
-		    		playerProToFarmSalary++;
-		    	}
+	    		if (g == 1 && status >= 2){
+	    			// If moving the player back up to the pros, remove the movetowaiver class.
+	    			var elemLine = 'line1_' + explode[7];
+	    			var elem = document.getElementById(elemLine);
+	    			elem.className = elem.className.replace(" movetowaiver","");
+	    			elem.className = elem.className.replace(" protofarmsalary","");
+	    			elem.className = elem.className.replace(" protofarmov","");
+	    		}
+		    		
+		    	
+
+		    	
 		    }
 		}
 
