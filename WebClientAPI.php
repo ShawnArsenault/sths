@@ -438,7 +438,7 @@ function load_api_pageinfo(){
 									// Make them Pro Scratched or Farm Scratched.
 									$row["Status".$s] = ($row["Status".$s] == 3 || $row["Status".$s] == 2) ? 2 : 0;
 								}
-								if($row["Condition"] <= 95 && $row["Status".$s] == 3){
+								if($row["Condition"] < 95 && $row["Status".$s] == 3){
 									$row["Status".$s] = 2;
 								}
 								if($row["Condition"] <= 95 && $row["Status".$s] == 1){
@@ -523,8 +523,8 @@ function load_api_pageinfo(){
 																	// Checks to see if a player is injured or has 0 contract. if so, it will add an injury or nocontract class
 																	// to the <li> which will not allow him to be part of the JQuery drag and drop
 																	// therefore unmovable. 
-																	$stick = ($s["Condition"] < 96 || $s["Contract"] == 0 || $s["Suspension"]  > 0) ? " sticky": "";
-																	$inj = ($s["Condition"] < 96) ? " injury": "";
+																	$stick = ($s["Condition"] < 95 || $s["Contract"] == 0 || $s["Suspension"]  > 0) ? " sticky": "";
+																	$inj = ($s["Condition"] < 95) ? " injury": "";
 																	$noc = ($s["Contract"] == 0) ? " nocontract": "";
 																	$sus = ($s["Suspension"]  > 0) ? " suspension": "";
 																	
