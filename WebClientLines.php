@@ -19,14 +19,11 @@
 	// Look for a team ID in the URL, if non exists use 0
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
 	$l = (isset($_REQUEST["League"])) ? $_REQUEST["League"] : false;
-
+	$row = array();
 	if($t > 0){
 		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
 		$row = $rs->fetchArray();
-	}else{
-		$row = array();
 	}
-
 	// Make a default header 
 	api_layout_header("lineeditor",$db,$t,$l,$WebClientHeadCode);
 	api_alpha_testing();

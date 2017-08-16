@@ -17,12 +17,12 @@
 	$db = api_sqlite_connect($DatabaseFile);
 	
 	// Look for a team ID in the URL, if non exists use 0
+
 	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
+	$row = array();
 	if($t > 0){
 		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
 		$row = $rs->fetchArray();
-	}else{
-		$row = array();
 	}
 	// Make a default header 
 	// 5 Paramaters. PageID, database, teamid, League = Pro/Farm, $headcode (custom headercode can be added. DEFAULT "")
