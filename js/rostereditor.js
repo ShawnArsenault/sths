@@ -178,7 +178,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		if(playerProToFarmTradeDeadline > 0){errorText += '<div class="erroritem farmmove tradedeadline">Cannot send ' + playerProToFarmTradeDeadline + ' players to the farm. (After Trade Deadline).</div>';}
 		if(playerProToFarmEliminated > 0){errorText += '<div class="erroritem farmmove eliminated">Cannot send ' + playerProToFarmEliminated + ' players to the farm. (Eliminated From Playoffs).</div>';}
 		if(playerProToFarmOverall > 0){errorText += '<div class="erroritem farmmove overall">Cannot send ' + playerProToFarmOverall + ' players to the farm. (Farm Overall Limit).</div>';}
-		if(playerProToFarmSalary > 0){s = (playerProToFarmSalary == 1) ? '': 's';errorText += '<div class="erroritem farmmove salary">Cannot send ' + playerProToFarmSalary + ' player'+ s +' to the farm. (Farm Salary Limit).</div>';}
+		//if(playerProToFarmSalary > 0){s = (playerProToFarmSalary == 1) ? '': 's';errorText += '<div class="erroritem farmmove salary">Cannot send ' + playerProToFarmSalary + ' player'+ s +' to the farm. (Farm Salary Limit).</div>';}
 		// If the error text is empty still then the roster is complete and display
 		if(errorText == ''){
 			errorElement.innerHTML = waiverText + '<div class="rostercomplete">Roster is complete.</div>';

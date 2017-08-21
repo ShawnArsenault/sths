@@ -528,7 +528,10 @@ function load_api_pageinfo(){
 																			$value = api_fields_input_values($s);
 																			?>
 																			<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
-																			<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
+																			<div class="rowname"><?= api_initial_name($s["Name"]); ?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
+																			<?php if($s["Condition"] < 100){?>
+																				<div class="rowcondition"><?= $s["Condition"]; ?> CD</div>
+																			<?php } ?>
 																		</div>
 																	</li>
 																<?php }
