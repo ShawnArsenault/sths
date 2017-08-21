@@ -31,6 +31,11 @@ function load_api(){
 	function api_alpha_testing(){
 		?><div class="instructions">Web Client currently in ALPHA testing mode. Use at own risk. Please report bugs and errors to :<br /><a href=http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732>http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732</a></div><?php
 	}
+	function api_initial_name($name){
+	$exp = explode(" ",$name);
+	$dis = $exp[0][0] . ". " . $exp[count($exp)-1];
+	return $dis; 
+}
 }
 
 function load_api_dbresults(){
