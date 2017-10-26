@@ -18,7 +18,7 @@
 	
 	// Look for a team ID in the URL, if non exists use 0
 
-	$t = (isset($_REQUEST["TeamID"])) ? $_REQUEST["TeamID"] : 0;
+	$t = (isset($_REQUEST["TeamID"])) ? filter_var($_REQUEST["TeamID"], FILTER_SANITIZE_NUMBER_INT): 0;
 	$row = array();
 	if($t > 0){
 		$rs = api_dbresult_teamsbyname($db,"Pro",$t);
@@ -35,7 +35,7 @@
 	if(api_security_access($row)){
 		// Display the roster editor page using API.
 		// use 3 paramaters Database, TeamID, showH1Tag (DEFAULT true/false)   
-		api_pageinfo_editor_roster($db,$t);
+		if($t > 0){api_pageinfo_editor_roster($db,$t);}
 	}else{
 		api_html_login_form($row);
 	}

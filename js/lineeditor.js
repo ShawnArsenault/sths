@@ -154,7 +154,7 @@ function getGroups(){
 	group[13] = ['Line2PK4ForwardCenter','Line2PK4ForwardWing','Line2PK4DefenseDefense1','Line2PK4DefenseDefense2'];
 	group[14] = ['Line1PK3ForwardCenter','Line1PK3DefenseDefense1','Line1PK3DefenseDefense2'];
 	group[15] = ['Line2PK3ForwardCenter','Line2PK3DefenseDefense1','Line2PK3DefenseDefense2'];
-	group[16] = ['Goaler1','Goaler2'];
+	group[16] = ['Goaler1','Goaler2','Goaler3'];
 	group[17] = ['ExtraForwardN1','ExtraForwardN2','ExtraForwardN3'];
 	group[18] = ['ExtraForwardPP1','ExtraForwardPP2'];
 	group[19] = ['ExtraForwardPK'];
