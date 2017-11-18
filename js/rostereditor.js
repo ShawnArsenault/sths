@@ -140,7 +140,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 			    	else{status = 0;}
 			    // Else its a player and increment variables where needed
 			    }else{
-			    	if(isWaivers == "true" && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
+			    	if(isWaivers == true && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
 						if(waiverList.indexOf(explode[0]) == -1){
 							waiverList.push(explode[0]);
 						}
