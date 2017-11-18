@@ -101,7 +101,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		    		playerProToFarmOverall++;
 		    	}
 		    	// Check for Salary to see if their Salary is allowed in the farm
-		    	if(status <= 1 && explode[11] > MaxFarmSalary){
+		    	if(status <= 1 && explode[11] > MaxFarmSalary && MaxFarmSalary > 0){
 		    		if(elem.className.match(/\bprotofarmsalary\b/)){var me;}else{elem.className = elem.className + " protofarmsalary";} 	
 		    		playerProToFarmSalary++;
 		    	}
