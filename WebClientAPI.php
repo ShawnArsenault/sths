@@ -53,7 +53,7 @@ function load_api_dbresults(){
 	function api_dbresult_teamname($db,$teamid,$league){
 		$sql = "SELECT t.Name AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
 		return $db->querySingle($sql,true);
-	}
+	}	
 	function api_dbresult_teamnamenumber($db){
 		$sql = "SELECT Name, Number FROM TeamProInfo ORDER BY Name;";
 		$return = $db->query($sql);
@@ -639,6 +639,7 @@ function load_api_pageinfo(){
 						$sqlno .= $f . " = " . $valno . ", ";
 					}
 				}
+	
 				
 				$sql = rtrim($sql,", ");
 				$sqlno .= " WebClientModify = 'True' ";
@@ -814,6 +815,7 @@ function load_api_pageinfo(){
 																		<div class="positionline">
 																			<div class="positionlabel"><?= $x?>.</div>
 																			<div class="positionname">
+																				<?php  $row["OT" . $p.$x] = (isset($availableplayers[api_MakeCSSClass($row["OT" . $p.$x])])) ? $row["OT" . $p.$x] : "";?>															
 																				<input class="textname" id="OT<?= $p.$x;?>" onclick="ChangePlayer('OT<?= $p.$x;?>','<?= $league ?>',<?=$cpfields?>);"  readonly type="text" name="txtLine[OT<?=$p.$x;?>]" value="<?= $row["OT". $p.$x]; ?>">
 																			</div>
 																		</div><?php
@@ -1081,6 +1083,7 @@ function load_api_pageinfo(){
 				$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
 				$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
 			} // End while for the schedule
+			If ($count == 0){$nextgames[++$count][$league]["Day"] = "";}
 		} // End foreach array(Pro,Farm)
 
 		//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
