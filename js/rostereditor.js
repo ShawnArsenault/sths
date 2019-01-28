@@ -101,7 +101,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 		    		playerProToFarmOverall++;
 		    	}
 		    	// Check for Salary to see if their Salary is allowed in the farm
-		    	if(status <= 1 && explode[11] > MaxFarmSalary){
+		    	if(status <= 1 && explode[11] > MaxFarmSalary && MaxFarmSalary > 0){
 		    		if(elem.className.match(/\bprotofarmsalary\b/)){var me;}else{elem.className = elem.className + " protofarmsalary";} 	
 		    		playerProToFarmSalary++;
 		    	}
@@ -140,7 +140,7 @@ function roster_validator(	MaximumPlayerPerTeam,MinimumPlayerPerTeam,isWaivers,B
 			    	else{status = 0;}
 			    // Else its a player and increment variables where needed
 			    }else{
-			    	if(isWaivers == "true" && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
+			    	if(isWaivers == true && explode[6]=="true" && g == 1 && status <= 1 && explode[4] >= 2){
 						if(waiverList.indexOf(explode[0]) == -1){
 							waiverList.push(explode[0]);
 						}

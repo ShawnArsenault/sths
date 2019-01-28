@@ -51,10 +51,14 @@ function load_api_dbresults(){
 		}
 		return $row;
 	}
+	function api_GoalerInGame($db,$l){
+		$sql = "SELECT " . $l ."GoalerInGame AS GoalerInGame FROM LeagueWebClient";
+		return $db->querySingle($sql,true);
+	}
 	function api_dbresult_teamname($db,$teamid,$league){
 		$sql = "SELECT t.Name AS FullTeamName FROM Team". $league ."Info AS t WHERE Number = " . $teamid;
 		return $db->querySingle($sql,true);
-	}
+	}	
 	function api_dbresult_teamnamenumber($db){
 		$sql = "SELECT Name, Number FROM TeamProInfo ORDER BY Name;";
 		$return = $db->query($sql);
@@ -603,11 +607,10 @@ function load_api_pageinfo(){
 		}// end if $teamid
 
 		
-	
+	    			$bannertext = "";
 		// If the updatelines submit button is clicked 
 		if(isset($_POST["sbtUpdateLines"])){
 			$fminfo = "";
-			$bannertext = "";
 			$dbfields = api_get_fields($db,$customOTlines,$league);
 			$fmfields = array_merge($_POST["txtLine"],$_POST["txtStrategies"]);
 
@@ -630,7 +633,7 @@ function load_api_pageinfo(){
 				// For now this will update all 10 game slots for lines.
 				$sql   = "UPDATE Team". $league ."Lines SET ";
 				$sqlno = "UPDATE Team". $league ."LinesNumberOnly SET ";
-
+				
 				foreach($dbfields AS $i=>$f){
 					if($arrDB[$i] != $arrFM[$i]){
 						if(is_numeric($arrFM[$i])){
@@ -638,12 +641,13 @@ function load_api_pageinfo(){
 							$valno  = api_sqlite_escape($arrFM[$i]);
 						}else{
 							$val    = "'" . api_sqlite_escape($arrFM[$i]) . "'";
-							$valno  = $availableplayers[api_MakeCSSClass($arrFM[$i])]["id"];
+							if ($val == "''"){$valno = 0;}else{$valno  = $availableplayers[api_MakeCSSClass($arrFM[$i])]["id"];}
 						}
 						$sql   .= $f . " = " . $val . ", ";
 						$sqlno .= $f . " = " . $valno . ", ";
 					}
 				}
+	
 				
 				$sql = rtrim($sql,", ");
 				$sqlno .= " WebClientModify = 'True' ";
@@ -756,10 +760,11 @@ function load_api_pageinfo(){
 															<?php // Start with the goalies. ?>
 															<div class="linesection id<?= api_MakeCSSClass($i)?> goalies">
 																<?php 
-																	foreach(array(1=>"Starting Goalie",2=>"Backup Goalie") AS $gid=>$g){?>
-																		<h4><?= $g?></h4>
-																		<div class="blockcontainer">
-																			<?php  $row["Goaler" . $gid] = (isset($availableplayers[api_MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
+																	$GoalerInGame = api_GoalerInGame($db,$league);																
+																	foreach(array(1=>"Starting Goalie",2=>"Backup Goalie",3=>"Third Goalie") AS $gid=>$g){?>
+																		<?php if ($g == "Third Goalie" AND $GoalerInGame['GoalerInGame'] == 2){echo "<h4 style=\"display:none\">". $g ."</h4>";}else{echo "<h4>". $g ."</h4>";}?>
+																		<div class="blockcontainer" <?php if ($g == "Third Goalie" AND $GoalerInGame['GoalerInGame'] == 2){echo "style=\"display:none\">";}else{echo ">";}
+																			$row["Goaler" . $gid] = (isset($availableplayers[api_MakeCSSClass($row["Goaler".$gid])])) ? $row["Goaler".$gid]: "";?>
 																			<div class="positionline"><?= "<input class=\"textname\" id=\"Goaler". $gid ."\" onclick=\"ChangePlayer('Goaler". $gid ."','". $league ."',".$cpfields.");\"  readonly type=\"text\" name=\"txtLine[Goaler". $gid ."]\" value=\"". $row["Goaler".$gid] ."\">";?></div>
 																		</div><?php 
 																	}
@@ -818,6 +823,7 @@ function load_api_pageinfo(){
 																		<div class="positionline">
 																			<div class="positionlabel"><?= $x?>.</div>
 																			<div class="positionname">
+																				<?php  $row["OT" . $p.$x] = (isset($availableplayers[api_MakeCSSClass($row["OT" . $p.$x])])) ? $row["OT" . $p.$x] : "";?>															
 																				<input class="textname" id="OT<?= $p.$x;?>" onclick="ChangePlayer('OT<?= $p.$x;?>','<?= $league ?>',<?=$cpfields?>);"  readonly type="text" name="txtLine[OT<?=$p.$x;?>]" value="<?= $row["OT". $p.$x]; ?>">
 																			</div>
 																		</div><?php
@@ -1085,6 +1091,7 @@ function load_api_pageinfo(){
 				$nextgames[$count][$league]["Opponent"] = $row["Opponent"];
 				$nextgames[$count][$league]["AtVs"] = $row["AtVs"];
 			} // End while for the schedule
+			If ($count == 0){$nextgames[++$count][$league]["Day"] = "";}
 		} // End foreach array(Pro,Farm)
 
 		//Its possible that no schedule has been created yet. If this is the case, we don't need an accordion of rosters, just 1 using Status1.
