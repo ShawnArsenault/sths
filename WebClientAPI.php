@@ -32,10 +32,10 @@ function load_api(){
 		?><div class="instructions">Web Client currently in ALPHA testing mode. Use at own risk. Please report bugs and errors to :<br /><a href=http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732>http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732</a></div><?php
 	}
 	function api_initial_name($name){
-	$exp = explode(" ",$name);
-	$dis = $exp[0][0] . ". " . $exp[count($exp)-1];
-	return $dis; 
-}
+		$exp = explode(" ",$name);
+		$dis = $exp[0][0] . ". " . $exp[count($exp)-1];
+		return $dis; 
+	}
 }
 
 function load_api_dbresults(){
@@ -373,12 +373,12 @@ function load_api_pageinfo(){
 								elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
 								else $playerStatus = 0;
 							}else{
-								if($explodeValue[4] != $playerStatus){
+								//if($explodeValue[4] != $playerStatus){
 									// Check to see if the updated player status = what is already in the DB. 
 									// If there is a change, add to the arrSort array.
 									$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
 									$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
-								}	
+								//}	
 							}// End if count($explodeValue)
 						} // End foreach $status
 					} // End foreach $_POST["txtRoster"]
@@ -402,7 +402,6 @@ function load_api_pageinfo(){
 							} // End foreach $player
 						}// End foreach $arrSort
 						//Update the database and save the lines.
-						
 						$db->busyTimeout(5000);
 						$db->exec("pragma journal_mode=memory;");
 						$db->exec($sql);
