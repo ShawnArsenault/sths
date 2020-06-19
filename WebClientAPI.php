@@ -373,6 +373,7 @@ function load_api_pageinfo(){
 								elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
 								else $playerStatus = 0;
 							}else{
+								// Remove the Check for no change.
 								//if($explodeValue[4] != $playerStatus){
 									// Check to see if the updated player status = what is already in the DB. 
 									// If there is a change, add to the arrSort array.
