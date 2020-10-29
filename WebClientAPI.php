@@ -31,6 +31,11 @@ function load_api(){
 	function api_alpha_testing(){
 		?><div class="instructions">Web Client currently in ALPHA testing mode. Use at own risk. Please report bugs and errors to :<br /><a href=http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732>http://sths.simont.info/Forum/viewtopic.php?f=4&t=12732</a></div><?php
 	}
+	function api_initial_name($name){
+		$exp = explode(" ",$name);
+		$dis = $exp[0][0] . ". " . $exp[count($exp)-1];
+		return $dis; 
+	}
 }
 
 function load_api_dbresults(){
@@ -368,12 +373,13 @@ function load_api_pageinfo(){
 								elseif($explodeValue[1] == "FarmDress") $playerStatus = 1;
 								else $playerStatus = 0;
 							}else{
-								if($explodeValue[4] != $playerStatus){
+								// Remove the Check for no change.
+								//if($explodeValue[4] != $playerStatus){
 									// Check to see if the updated player status = what is already in the DB. 
 									// If there is a change, add to the arrSort array.
 									$table = ($explodeValue[2] == 16) ? "Goaler" : "Player";
 									$arrSort[$table][$explodeValue[1]]["Status". $statuses] = $playerStatus;
-								}	
+								//}	
 							}// End if count($explodeValue)
 						} // End foreach $status
 					} // End foreach $_POST["txtRoster"]
@@ -397,7 +403,6 @@ function load_api_pageinfo(){
 							} // End foreach $player
 						}// End foreach $arrSort
 						//Update the database and save the lines.
-						
 						$db->busyTimeout(5000);
 						$db->exec("pragma journal_mode=memory;");
 						$db->exec($sql);
@@ -532,7 +537,10 @@ function load_api_pageinfo(){
 																			$value = api_fields_input_values($s);
 																			?>
 																			<input class="rosterline<?=$nextgame; ?> <?= "input".$columnid . $nextgame?>" id="g<?=$nextgame;?>t<?=$columnid;?><?= $colcount++;?>" type="hidden" name="txtRoster[<?=$nextgame; ?>][]" value="<?= $value; ?>">
-																			<div class="rowname"><?= $s["Name"]?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
+																			<div class="rowname"><?= api_initial_name($s["Name"]); ?></div><div class="rowinfoline"><?= $s["PositionString"]?> - <?= $s["Overall"]?>OV</div>
+																			<?php if($s["Condition"] < 100){?>
+																				<div class="rowcondition"><?= $s["Condition"]; ?> CD</div>
+																			<?php } ?>
 																		</div>
 																	</li>
 																<?php }
