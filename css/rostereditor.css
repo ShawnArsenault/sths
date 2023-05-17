@@ -1,13 +1,14 @@
-
+.positionlist label{margin-right:2vw;}
 #rostereditor  option{padding:1px 0px 0px 5px;}
 #rostereditor  option + option{border-top:1px dotted #cccccc;}
 
 /*
 #rostereditor .rostererror{margin-bottom:5px;color:#D8000C;background-color: #FFBABA;overflow:hidden;}
 #rostereditor .rostererror .error{font-size:11px;float:left;margin-right:15px;}
-#rostereditor .rostererror .waivernotice{padding:2px 5px;font-weight:bold;color: #9F6000;background-color: #FEEFB3;margin-bottom:2px;}
 #rostereditor .rostererror .error + .error{}
 */
+#rostereditor .rostererror .waivernotice{padding:2px 5px;font-weight:bold;color: #9F6000;background-color: #FEEFB3;margin-bottom:5px;font-size:large;padding:5px;}
+
 #rostereditor .columnwrapper{overflow:hidden;}
 #rostereditor h4{margin:0px 0px 5px 0px;padding:0px;text-align:center;}
 #rostereditor .col4{overflow:hidden;display:block;width:25%;float:left;padding-bottom:10px;}
@@ -26,19 +27,24 @@
 }
 #rostereditor li + li{margin-top:4px;}
 #rostereditor .rowinfo{float:right;width:87%;}
-#rostereditor .rowname{float:left;}
-#rostereditor .rowcondition{float:right;box-shadow:1px 1px 1px #888;padding:2px 5px;margin-right:0.5em;font-size:0.7em;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;}
-#rostereditor .rowinfoline{float:left;margin-left:5px;}
+#rostereditor .rowname{float:left;font-size:small;}
+#rostereditor .rowcondition{float:right;box-shadow:1px 1px 1px #888;padding:2px 5px;margin-right:0.5em;font-size:0.7em;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;background-color:#fff48c;}
+#rostereditor .rowsuspension{float:right;box-shadow:1px 1px 1px #888;padding:2px 5px;margin-right:0.5em;font-size:0.7em;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;}
+#rostereditor .rowsuspension99{float:right;box-shadow:1px 1px 1px #888;padding:2px 5px;margin-right:0.5em;font-size:0.7em;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;background-color:#FFBF00;}
+#rostereditor .rowwaiver{float:right;box-shadow:1px 1px 1px #888;padding:2px 5px;margin-right:0.5em;font-size:0.7em;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;background-color:#ffb38a;}
+#rostereditor .rowinfoline{float:left;margin-left:5px;font-size:small;}
 
 #rostereditor .injury{background-color:#f2dede !important;}
 #rostereditor .suspension{background-color:#f5dede !important;}
+#rostereditor .canplaypro{background-color:#f8dede !important;}
+#rostereditor .canplayfarm{background-color:#f8dede !important;}
 #rostereditor .ProScratch.nocontract{color:#cccccc !important;}
 #rostereditor .FarmScratch.nocontract{color:#666666 !important;}
 
 #rostereditor .ProDress{background-color:#fefefe;}
-#rostereditor .ProScratch{background-color:#e8e8e8;}
-#rostereditor .FarmDress{background-color:#cccccc;}
-#rostereditor .FarmScratch{background-color:#999999;}
+#rostereditor .ProScratch{background-color:#cccccc;}
+#rostereditor .FarmDress{background-color:#e6e1f9;}
+#rostereditor .FarmScratch{background-color:#bba8ff;}
 #rostereditor .movetowaiver{color: #9F6000;background-color: #FEEFB3;}
 /*#rostereditor .protofarmsalary{border: 2px solid #d8000c;}*/
 
@@ -54,6 +60,6 @@
 
 	#rostereditor .rowinfo{float:right;width:84%;}
 	#rostereditor .rowname{float:none;}
-	#rostereditor .rowinfoline{float:none;margin:1px 0px 0px 1px;font-size:3px;}
+	#rostereditor .rowinfoline{float:none;margin:1px 0px 0px 1px;font-size:3px;font-size:small;}
 }
 
